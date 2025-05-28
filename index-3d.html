@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Load p5.js first and ensure it's fully loaded before sound library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.js"></script>
+    <!-- Add a small delay before loading sound library -->
+    <script>
+      // Ensure p5 is fully initialized before loading p5.sound
+      window.onload = function() {
+        // p5 is now loaded, now we can safely use p5.sound
+        if (typeof p5 !== 'undefined') {
+          console.log('p5.js loaded successfully');
+        }
+      };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/BufferGeometryUtils.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Biome | Parsa Azari</title>
+    <meta name="description" content="An immersive generative art piece exploring the boundary between artificial life and computational aesthetics. Created by Parsa Azari for ZHdK Digital Arts Festival.">
+    <!-- Open Graph meta tags for social sharing -->
+    <meta property="og:title" content="Semantic Biome | Parsa Azari">
+    <meta property="og:description" content="An immersive generative art piece exploring the boundary between artificial life and computational aesthetics. A digital meditation on emergence and volumetric digital ecosystems.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://timrodenbroeker.de/synthetic-biome-preview.jpg">
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Semantic Biome | Parsa Azari">
+    <meta name="twitter:description" content="An immersive generative art piece exploring artificial life systems and computational aesthetics in volumetric space.">
+    <meta name="twitter:creator" content="@timrodenbroeker">
+    <!-- Performance optimization -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iI2ZmMzMzMyIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEwIiBmaWxsPSIjMDAwIi8+PC9zdmc+">
+    
+    <style>
+      .camera-controls {
+        position: fixed;
+        bottom: calc(var(--spacing-unit) * 4);
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--panel-bg);
+        padding: calc(var(--spacing-unit) * 1.5);
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+        display: flex;
+        gap: calc(var(--spacing-unit) * 1.5);
+        z-index: 100;
+        border: 1px solid var(--panel-border);
+        box-shadow: var(--depth-shadow);
+        opacity: 0.7;
+        transition: opacity 0.3s;
+      }
+      
+      .camera-controls:hover {
+        opacity: 1;
+      }
+      
+      .camera-btn {
+        background: rgba(25, 25, 35, 0.7);
+        border: 1px solid var(--panel-border);
+        color: var(--moma-light);
+        width: calc(var(--spacing-unit) * 4);
+        height: calc(var(--spacing-unit) * 4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: 'Space Mono', monospace;
+        font-size: 1rem;
+        transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+        user-select: none;
+      }
+      
+      .camera-btn:hover {
+        background-color: var(--moma-accent);
+        transform: translateY(-2px);
+      }
+      
+      .camera-btn:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <!-- Canvas will be inserted here by p5.js -->
+    </main>
+    
+    <div id="moma-tag">Parsa Azari</div>
+    
+    <div id="controls">
+      <button id="palette-toggle" class="control-btn" aria-label="Change color palette">
+        <span class="btn-icon">◐</span>
+      </button>
+      <button id="sound-toggle" class="control-btn" aria-label="Toggle sound">
+        <span class="btn-icon">♪</span>
+      </button>
+      <button id="info-toggle" class="control-btn active" aria-label="Show/hide information">
+        <span class="btn-icon">ⓘ</span>
+      </button>
+    </div>
+    
+    <div class="camera-controls">
+      <div class="camera-btn" id="camera-reset" title="Clear space and remove all words">↻</div>
+      <div class="camera-btn" id="camera-zoom-in" title="Zoom in">+</div>
+      <div class="camera-btn" id="camera-zoom-out" title="Zoom out">−</div>
+    </div>
+    
+    <div id="performance-monitor"></div>
+    
+    <div id="info-panel">
+      <div class="panel-header">
+        <h1>Semantic Biome</h1>
+        <button class="learn-more-btn"><div class="qr-border"></div></button>
+      </div>
+      
+      <div class="panel-content">
+        <p class="curatorial-text">Semantic Biome explores the evolving relationship between typography, digital ecology, and emergent intelligence. Within this three-dimensional space, autonomous entities from diverse writing systems coexist, interact, and form unexpected linguistic connections.</p>
+        <p class="curatorial-text">Each character-based organism exists within a complex volumetric ecosystem, governed by algorithmic behaviors that simulate evolutionary patterns and emergent intelligence. The visual language is built on the tension between order and chaos—mirroring how digital systems and human language share fundamental organizational principles yet embrace unpredictability.</p>
+        <p class="curatorial-text">As you navigate and interact with this typographic landscape, the organisms respond to your presence, adapting their behaviors and creating new patterns of visual poetry across multiple writing systems. This digital meditation invites reflection on how meaning emerges from the seemingly random interactions of discrete elements within both computational and linguistic frameworks.</p>
+        
+        <div class="interaction-guide">
+          <span class="label">Interaction:</span> 
+          <span>Hover to generate new letters. Drag to rotate the environment. Use mouse wheel to zoom in/out. Your movement influences entity behavior. Use keyboard shortcuts: C (color palette), S (audio toggle), I (info panel), R (clear space and remove words).</span>
+        </div>
+        
+        <div id="stats" class="stats-display"></div>
+        
+        <div class="acquisition-info">
+          <span>2023</span>
+          <span>parsaazari.com</span>
+        </div>
+      </div>
+    </div>
+    
+    <script src="sketch-3d.js"></script>
+    <script>
+      // Performance monitor
+      const performanceMonitor = document.getElementById('performance-monitor');
+      
+      // Store p5 instance for access to frameRate
+      window.addEventListener('load', () => {
+        // Wait for p5.js to initialize completely
+        setTimeout(() => {
+          setInterval(() => {
+            // Access frameRate via the p5 instance
+            if (window._renderer && window._renderer._frameRate) {
+              const fps = Math.round(window._renderer._frameRate);
+              performanceMonitor.textContent = `${fps} FPS`;
+              
+              // Change color based on performance
+              if (fps > 45) {
+                performanceMonitor.style.color = 'rgba(120, 255, 120, 0.6)';
+              } else if (fps > 25) {
+                performanceMonitor.style.color = 'rgba(255, 255, 120, 0.6)';
+              } else {
+                performanceMonitor.style.color = 'rgba(255, 120, 120, 0.6)';
+              }
+            }
+          }, 500);
+        }, 1000); // Give p5.js time to initialize
+      });
+      
+      // Add camera control buttons functionality
+      document.getElementById('camera-reset').addEventListener('click', () => {
+        if (window.resetCamera) window.resetCamera();
+      });
+      
+      document.getElementById('camera-zoom-in').addEventListener('click', () => {
+        if (window.zoomCamera) window.zoomCamera(-50);
+      });
+      
+      document.getElementById('camera-zoom-out').addEventListener('click', () => {
+        if (window.zoomCamera) window.zoomCamera(50);
+      });
+    </script>
+  </body>
+</html> 

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Controls Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.js"></script>
+  <script src="sketch-3d.js"></script>
+  <style>
+    body { margin: 0; padding: 0; overflow: hidden; }
+    .test-info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      font-family: monospace;
+      z-index: 100;
+    }
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-info">
+    <h3>Camera Controls Test</h3>
+    <p>Testing the camera controls implementation:</p>
+    <ul>
+      <li>Press 'R' key to clear space and remove words</li>
+      <li>Use mouse wheel to zoom in/out</li>
+      <li>Drag to rotate the camera</li>
+    </ul>
+    <button onclick="window.resetCamera()">Clear Space (Button)</button>
+    <div id="camera-status">Camera Status: Default</div>
+  </div>
+
+  <script>
+    // Update camera status display
+    window.addEventListener('mousemove', updateCameraStatus);
+    window.addEventListener('mousewheel', updateCameraStatus);
+    window.addEventListener('keydown', updateCameraStatus);
+    
+    function updateCameraStatus() {
+      // Update with a slight delay to ensure values are current
+      setTimeout(() => {
+        if (window.cameraRotation && window.cameraZoom) {
+          const status = document.getElementById('camera-status');
+          if (status) {
+            status.innerHTML = `Camera Status: Rotation X: ${window.cameraRotation.x.toFixed(2)}, 
+                                Y: ${window.cameraRotation.y.toFixed(2)}, 
+                                Zoom: ${window.cameraZoom.toFixed(0)}`;
+          }
+        }
+      }, 100);
+    }
+  </script>
+</body>
+</html> 

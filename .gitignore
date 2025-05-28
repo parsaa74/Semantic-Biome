@@ -1,0 +1,36 @@
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+/.cursor/
+
+# Backup files
+*.bak
+*-bak
+*.backup
+*-backup
+*.fixed-bak
+
+# Environment files
+.env
+.env.local
+
+# Large datasets
+/WNdb-3.0/
+
+# Keep font files for GitHub Pages
+# *.typeface.json
+
+# Temporary files
+.tmp/
+*.swp 

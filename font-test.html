@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Loading Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/BufferGeometryUtils.js"></script>
+  <style>
+    body { margin: 0; padding: 0; overflow: hidden; background: #111; }
+    .status {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: monospace;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      z-index: 100;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <div id="status" class="status">Font Test: Initializing...</div>
+  
+  <script>
+    let threeScene, threeCamera, threeRenderer;
+    let loadedFonts = {};
+    let testMeshes = [];
+    let statusDiv;
+    
+    // Create a global empty font as ultimate fallback
+    const createEmptyFont = () => {
+      return {
+        glyphs: {},
+        generateShapes: function() { return []; }
+      };
+    };
+    
+    function preload() {
+      statusDiv = document.getElementById('status');
+      updateStatus("Loading fonts...");
+      
+      const loader = new THREE.FontLoader();
+      
+      // Log steps of font loading process
+      function safeLoadFont(fontUrl, fontKey, fontName) {
+        updateStatus(`Attempting to load ${fontName}...`);
+        
+        try {
+          loader.load(
+            fontUrl, 
+            function(font) {
+              loadedFonts[fontKey] = font;
+              updateStatus(`Successfully loaded ${fontName}. Has generateShapes: ${typeof font.generateShapes === 'function'}`);
+              createTestText(fontKey);
+            },
+            // onProgress callback
+            undefined, 
+            // onError callback
+            function(error) {
+              updateStatus(`Error loading ${fontName}: ${error}`);
+              // Create fallback
+              loadedFonts[fontKey] = createEmptyFont();
+              updateStatus(`Created fallback for ${fontName}`);
+            }
+          );
+        } catch (e) {
+          updateStatus(`Exception when loading ${fontName}: ${e.message}`);
+          loadedFonts[fontKey] = createEmptyFont();
+        }
+      }
+      
+      // Try loading the fonts
+      safeLoadFont('helvetiker_regular.typeface.json', 'default', 'Default font (helvetiker)');
+      safeLoadFont('Noto Sans Arabic_Regular.typeface.json', 'arabic', 'Noto Sans Arabic');
+    }
+    
+    function setup() {
+      const canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+      pixelDensity(1);
+      
+      updateStatus("Setting up three.js...");
+      
+      // Set up Three.js scene
+      threeScene = new THREE.Scene();
+      threeCamera = new THREE.PerspectiveCamera(60, windowWidth / windowHeight, 1, 5000);
+      threeCamera.position.set(0, 0, 400);
+      threeRenderer = new THREE.WebGLRenderer({ canvas: canvas.elt, antialias: true, alpha: true });
+      threeRenderer.setSize(windowWidth, windowHeight);
+      threeRenderer.setClearColor(0x111111, 1);
+      
+      // Add lights
+      const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+      threeScene.add(ambient);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+      dirLight.position.set(0, 1, 1);
+      threeScene.add(dirLight);
+      
+      updateStatus("Setup complete. Waiting for fonts to load...");
+    }
+    
+    function draw() {
+      // Empty draw function - We'll use Three.js for rendering
+      threeRenderer.render(threeScene, threeCamera);
+      
+      // Rotate test meshes if they exist
+      for (let mesh of testMeshes) {
+        if (mesh) {
+          mesh.rotation.x += 0.01;
+          mesh.rotation.y += 0.02;
+        }
+      }
+    }
+    
+    function createTestText(fontKey) {
+      const font = loadedFonts[fontKey];
+      updateStatus(`Creating test text with ${fontKey} font...`);
+      
+      try {
+        // Only create text if the font has generateShapes function
+        if (font && typeof font.generateShapes === 'function') {
+          // Create text geometry
+          const textGeometry = new THREE.TextGeometry("Hello 3D", {
+            font: font,
+            size: 20,
+            height: 5,
+            curveSegments: 6,
+            bevelEnabled: true,
+            bevelThickness: 2,
+            bevelSize: 1,
+            bevelSegments: 3
+          });
+          
+          // Center the text geometry
+          textGeometry.computeBoundingBox();
+          const centerOffsetX = -0.5 * (
+            textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x
+          );
+          const centerOffsetY = -0.5 * (
+            textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y
+          );
+          
+          // Create material
+          const material = new THREE.MeshPhongMaterial({ 
+            color: 0xffffff,
+            transparent: false,
+            shininess: 40,
+            specular: 0x333333
+          });
+          
+          // Create mesh
+          const textMesh = new THREE.Mesh(textGeometry, material);
+          textMesh.position.set(
+            centerOffsetX,
+            centerOffsetY + (testMeshes.length * 50), // Stack them vertically
+            0
+          );
+          
+          // Cast shadows
+          textMesh.castShadow = true;
+          textMesh.receiveShadow = true;
+          
+          // Add to scene
+          threeScene.add(textMesh);
+          testMeshes.push(textMesh);
+          
+          updateStatus(`Successfully created text with ${fontKey} font!`);
+        } else {
+          updateStatus(`Cannot create text: ${fontKey} font is not valid for TextGeometry (missing generateShapes method)`);
+          
+          // Create a fallback cube
+          const geometry = new THREE.BoxGeometry(100, 20, 10);
+          const material = new THREE.MeshPhongMaterial({ color: 0xff3333 });
+          const cube = new THREE.Mesh(geometry, material);
+          cube.position.y = testMeshes.length * 50;
+          threeScene.add(cube);
+          testMeshes.push(cube);
+          
+          updateStatus(`Created fallback cube for ${fontKey} font.`);
+        }
+      } catch (e) {
+        updateStatus(`Error creating text with ${fontKey} font: ${e.message}`);
+        
+        // Create red cube as error indicator
+        const geometry = new THREE.SphereGeometry(15, 16, 16);
+        const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.y = testMeshes.length * 50;
+        threeScene.add(sphere);
+        testMeshes.push(sphere);
+      }
+    }
+    
+    function updateStatus(message) {
+      if (statusDiv) {
+        let currentText = statusDiv.innerHTML;
+        statusDiv.innerHTML = currentText + "<br>" + message;
+        console.log(message);
+      }
+    }
+    
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      threeCamera.aspect = windowWidth / windowHeight;
+      threeCamera.updateProjectionMatrix();
+      threeRenderer.setSize(windowWidth, windowHeight);
+    }
+    
+    // Run preload and setup
+    preload();
+  </script>
+</body>
+</html> 
