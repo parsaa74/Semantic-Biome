@@ -59,10 +59,9 @@ The 3D version is more computationally intensive than the 2D original. If you ex
 
 ## Credits
 
-- Created by [Tim Rodenbroeker](https://timrodenbroeker.de)
-- Commissioned for Parsa Azari
+- By Parsa Azari
 - Built with [p5.js](https://p5js.org/)
 
 ## License
 
-© 2023 Tim Rodenbroeker. All rights reserved.
+© 2023 Parsa Azari. All rights reserved.
