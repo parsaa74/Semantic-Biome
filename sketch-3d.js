@@ -9,26 +9,26 @@ let lastDictionaryCheckTime = {};
 let wordNet = null; // Added to track cooldowns for dictionary checks per script
 // Configuration parameters for the system
 const CONFIG = {
-  maxOrganisms: 80, // Maximum number of organisms (doubled for more letters)
-  initialOrganisms: 20, // Number of initial organisms (increased for faster word formation)
-  connectionDistance: 250, // Increased from 150 to make words form more easily
+  maxOrganisms: 100, // Increased from 80 for more populate feeling in larger space
+  initialOrganisms: 25, // Increased from 20 for more initial activity
+  connectionDistance: 300, // Increased from 250 for easier word formation across larger space
   audioEnabled: true, // Enable audio
   postFx: true, // Post-processing effects (performance intensive)
 
-  // Physical parameters
+  // Physical parameters - Enhanced for maximum spatial freedom
   baseSize: { min: 8, max: 35 },
-  baseSpeed: { min: 0.4, max: 2.0 }, // Lowered max speed to make organisms slower and more stable
+  baseSpeed: { min: 2.0, max: 6.0 }, // Further increased speed range for more energetic movement
   baseMass: { min: 1, max: 9 },
-  baseLifespan: { min: 450, max: 900 }, // Increased lifespan to allow more time for cluster formation
-  cohesionDistance: 130, // Increased from 100 to encourage more grouping
-  separationDistance: 30, // Reduced from 35 to allow organisms to get closer to each other
-  alignmentDistance: 80, // Increased from 60 to make organisms follow each other more consistently
-  maxForce: 0.18, // Slightly reduced to make movements more stable
+  baseLifespan: { min: 600, max: 1200 }, // Increased lifespan for more time in expanded space
+  cohesionDistance: 250, // Further increased for more spacious grouping
+  separationDistance: 120, // Further increased for more personal space
+  alignmentDistance: 150, // Further increased for wider influence area
+  maxForce: 0.3, // Further increased for more dynamic movement
   
   // Word and Poetry Settings
   wordSettings: {
     minClusterSize: 2, // Allow just 2 characters to form a word
-    maxClusterSize: 15, // Increased to allow longer words
+    maxClusterSize: 5, // Reduced to allow shorter words
     clusterFormationRadiusFactor: 50.0, // Drastically increased to force clusters to form
     clusterStabilityTime: 300,    // Further reduced to check clusters even faster
     apiCooldownDictionary: 200, // Greatly reduced for more frequent checks
@@ -39,11 +39,11 @@ const CONFIG = {
     ignoreAPI: true,              // Skip API calls and use only local dictionary
     
     // Focus/Resonance Tool Settings
-    focusResonanceRadius: 150,    // Increased to cover more area
-    focusResonanceStrength: 0.1, // Increased for stronger effect
-    focusResonanceDamping: 0.95,  // Increased damping effect (lower value = more damping)
-    focusResonanceParticles: 15,  // More particles in the visual effect
-    focusResonancePulseSpeed: 0.05, // Speed of the pulsing animation
+    focusResonanceRadius: 300,    // Further increased radius for even wider influence
+    focusResonanceStrength: 0.03, // Further reduced for even gentler, more free-willed movement
+    focusResonanceDamping: 0.99,  // Even less damping for maximum freedom
+    focusResonanceParticles: 20,  // More particles for richer visual effect in larger space
+    focusResonancePulseSpeed: 0.04, // Slightly slower pulsing for more meditative feel
     clusterGlowColor: 0xFFFF00,    // Hex color for cluster glow
     clusterBreathingRate: 0.05,    // Rate of breathing for cluster glow
   },
@@ -193,13 +193,13 @@ const CONFIG = {
   // 3D specific configuration
   cameraControl: true, // Allow camera movement
   numLights: 3, // Number of point lights
-  depthRange: { min: -600, max: 600 }, // Z-axis range for organisms
+  depthRange: { min: -2000, max: 2000 }, // Further expanded Z-axis range for maximum spacious movement
   ambientLightLevel: 80, // Base light level
   pointLightIntensity: 120, // Intensity of point lights
-  defaultCameraZoom: 500, // Default camera zoom distance
+  defaultCameraZoom: 1000, // Further increased default zoom for wider view
   minCameraZoom: 100, // Minimum zoom distance
-  maxCameraZoom: 1000, // Maximum zoom distance
-  renderDistance: 2000, // Far plane for 3D rendering
+  maxCameraZoom: 3000, // Further increased max zoom for enormous space
+  renderDistance: 6000, // Further increased render distance for larger space
 
   // Existing parameters for audio, colors, etc.
   audioAnalysis: {
@@ -356,7 +356,7 @@ let fadeInAlpha = 0; // For fade-in animation
 let cam; // 3D camera
 let rotationY = 0; // Camera rotation
 let rotationX = 0; // Camera tilt
-let cameraZ = 500; // Camera distance
+let cameraZ = 1000; // Camera distance - updated to match new default
 let lights = []; // Array of point lights
 
 // Word formation variables
@@ -488,7 +488,7 @@ let focusResonanceRadius = CONFIG.wordSettings.focusResonanceRadius || 100; // R
 
 // Camera control variables
 let cameraRotation = { x: 0, y: 0 };
-let cameraZoom = 500; // Initial camera distance
+let cameraZoom = 800; // Initial camera distance (increased for wider view)
 
 // Expose these for testing
 window.cameraRotation = cameraRotation;
@@ -685,7 +685,7 @@ function setup() {
   if (CONFIG.cameraControl) {
     rotationY = 0;
     rotationX = 0;
-    cameraZ = 500;
+    cameraZ = 800; // Increased for wider initial view
   }
 
   // Setup lighting for 3D (p5.js, can be kept for legacy visuals)
@@ -1776,6 +1776,11 @@ class Organism {
         frame: frameCount,
       });
     }
+
+    // NEW: Add a slight dampening force to reduce chaotic movement
+    const dampening = this.vel.copy();
+    dampening.mult(-0.002); // Further reduced dampening for maximum freedom of movement
+    this.applyForce(dampening);
   }
 
   // 3D display method
@@ -3417,7 +3422,7 @@ window.resetCamera = function () {
   // Also reset the camera position
   cameraRotation.x = 0;
   cameraRotation.y = 0;
-  cameraZoom = CONFIG.defaultCameraZoom;
+  cameraZoom = CONFIG.defaultCameraZoom; // Now uses the updated default of 800
   
   console.log("Space cleared and camera reset to default position");
 };
@@ -3516,9 +3521,9 @@ function initializeOrganisms() {
   // Create remaining organisms with good letter distribution
   const remainingCount = initialCount - coreLetters.length;
   for (let i = 0; i < remainingCount; i++) {
-    // More varied positioning for remaining organisms
-    let x = random(-width / 2, width / 2) * 0.8; // Keep somewhat centered
-    let y = random(-height / 2, height / 2) * 0.8;
+    // More varied positioning for remaining organisms - further expanded for spaciousness
+    let x = random(-width / 2, width / 2) * 2.0; // Further expanded initial spread from 1.4 to 2.0
+    let y = random(-height / 2, height / 2) * 2.0;
     let z = random(CONFIG.depthRange.min, CONFIG.depthRange.max);
 
     let organism = createOrganism(x, y);
@@ -3946,6 +3951,15 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
   if (!wordString || wordString.length < CONFIG.wordSettings.minClusterSize) {
     return;
   }
+
+  // UPDATED: Limit word length to a reasonable size
+  const maxLength = 5; // Changed from CONFIG.wordSettings.maxClusterSize
+  if (wordString.length > maxLength) {
+    // If too long, we'll try to find words within this string
+    console.log(`Word "${wordString}" is too long (${wordString.length} chars), checking for words within it`);
+    findWordsWithinString(clusterId, wordString, organisms, currentTime, scriptCategory);
+    return;
+  }
   
   // Check if the word is valid using our dictionary
   console.log(`Checking word validity for: "${wordString}"`);
@@ -4053,13 +4067,11 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
         "art", "the", "and", "you", "for", "not", "with", "this", "but", "his", "from", "they",
         "say", "she", "will", "one", "all", "would", "there", "their", "what", "out", "about",
         "who", "get", "which", "when", "make", "can", "like", "time", "just", "him", "know",
-        "take", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than",
-        "then", "now", "look", "only", "come", "its", "over", "think", "also", "back", "after",
-        "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", "want",
-        "because", "any", "these", "give", "day", "most", "creative", "design", "poem", "word",
-        "life", "dream", "flow", "nature", "mind", "idea", "form", "light", "dark", "space",
-        "echo", "voice", "sound", "image", "color", "shape", "move", "pulse", "wave", "rhythm",
-        "energy", "being", "soul", "earth", "water", "fire", "air", "void", "chaos", "order",
+        "take", "into", "year", "your", "good", "some", "could", "these", "give", "day", "most",
+        "creative", "design", "poem", "word", "life", "dream", "flow", "nature", "mind", "idea",
+        "form", "light", "dark", "space", "echo", "voice", "sound", "image", "color", "shape",
+        "move", "pulse", "wave", "rhythm", "energy", "being", "soul", "earth", "water", "fire",
+        "air", "void", "chaos", "order",
         
         // Additional common English words
         "about", "above", "across", "act", "active", "add", "afraid", "after", "again", "age",
@@ -4270,6 +4282,69 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
       }
     }
   }
+
+// Function to find valid words within a longer string
+function findWordsWithinString(clusterId, wordString, organisms, currentTime, scriptCategory = 'default') {
+  const wordLower = wordString.toLowerCase();
+  let foundWords = false;
+  
+  // Get a list of common words to check against
+  const commonWords = [
+      // Common short words
+      "the", "and", "for", "not", "with", "but", "his", "from", "they", "say", "she", "will", 
+      "one", "all", "you", "was", "were", "that", "this", "what", "when", "who", "how", "which",
+      "now", "get", "got", "see", "saw", "look", "put", "take", "took", "made", "make", "come", 
+      "came", "give", "gave", "find", "time", "day", "year", "way", "home", "life", "work",
+      "air", "boy", "car", "dog", "eye", "far", "hat", "ice", "joy", "key", "leg", "man", "new",
+      "old", "pen", "red", "sun", "two", "use", "war", "yes", "art", "cat", "eat", "fat", "god",
+      "hit", "job", "law", "mix", "pay", "run", "sit", "top", "win", "add", "age", "bad", "box",
+      "cry", "cut", "did", "dry", "end", "few", "fix", "fly", "fun", "gas", "guy", "hot", "let",
+      "lie", "low", "map", "may", "odd", "oil", "own", "per", "pop", "raw", "sea", "set", "sky",
+      "tax", "ten", "try", "use", "via", "war", "wax", "yet", "zoo", "bait"
+  ];
+
+  // Look for each common word in the string
+  for (const word of commonWords) {
+    if (word.length >= CONFIG.wordSettings.minClusterSize && wordLower.includes(word)) {
+      console.log(`Found word "${word}" inside "${wordLower}"`);
+      const definition = `A word found within "${wordString}": ${word}`;
+      
+      // We need to find the organisms that correspond to this substring
+      const startIndex = wordLower.indexOf(word);
+      const endIndex = startIndex + word.length;
+      
+      // Create a subset of organisms that match the found word
+      // This is an approximation - we're assuming the organisms are in the same order as the characters
+      const relevantOrganisms = organisms.slice(startIndex, endIndex);
+      
+      if (relevantOrganisms.length === word.length) {
+        confirmWord(clusterId, word, relevantOrganisms, currentTime, definition, scriptCategory, "english");
+        foundWords = true;
+      }
+    }
+  }
+
+  // Also check for words from our predefined dictionary
+  const possibleWords = generatePossibleWords(wordLower);
+  for (const word of possibleWords) {
+    if (word.length >= CONFIG.wordSettings.minClusterSize && wordLower.includes(word)) {
+      console.log(`Found dictionary word "${word}" inside "${wordLower}"`);
+      const definition = `A word found within "${wordString}": ${word}`;
+      
+      // Find the organisms corresponding to this substring
+      const startIndex = wordLower.indexOf(word);
+      const endIndex = startIndex + word.length;
+      const relevantOrganisms = organisms.slice(startIndex, endIndex);
+      
+      if (relevantOrganisms.length === word.length) {
+        confirmWord(clusterId, word, relevantOrganisms, currentTime, definition, scriptCategory, "english");
+        foundWords = true;
+      }
+    }
+  }
+  
+  return foundWords;
+}
 
 // NEW: Generate possible words from a set of letters
 function generatePossibleWords(letters) {
@@ -4942,14 +5017,14 @@ function applyFlockingBehaviors(organism) {
     scriptCohesion.limit(CONFIG.maxForce * 1.0); // Allow full strength for script cohesion
   }
 
-  // Apply steering forces with weights based on DNA
-  let sepWeight = map(organism.dna.socialFactor, 0, 1, 1.5, 0.5);
-  let aliWeight = organism.dna.socialFactor;
+  // Apply steering forces with weights based on DNA (further reduced for maximum free movement)
+  let sepWeight = map(organism.dna.socialFactor, 0, 1, 1.0, 0.2); // Further reduced separation weight
+  let aliWeight = organism.dna.socialFactor * 0.5; // Further reduced alignment for more individual movement
   let cohWeight =
-    organism.dna.socialFactor * (organism.dna.attraction ? 1 : -0.5);
+    organism.dna.socialFactor * 0.4 * (organism.dna.attraction ? 1 : -0.5); // Further reduced cohesion
     
   // NEW: Script cohesion weight - always positive to encourage word formation
-  let scriptWeight = organism.dna.socialFactor * 1.2;
+  let scriptWeight = organism.dna.socialFactor * 1.0; // Slightly reduced script cohesion for freer movement
 
   // Apply forces to organism
   separation.mult(sepWeight);
@@ -4970,7 +5045,7 @@ function applyFlockingBehaviors(organism) {
   
   // NEW: Add a slight dampening force to reduce chaotic movement
   const dampening = organism.vel.copy();
-  dampening.mult(-0.01); // Small resistance like air friction
+  dampening.mult(-0.002); // Further reduced dampening for maximum freedom of movement
   organism.applyForce(dampening);
   
   // NEW: If focus resonance is active, enhance its effect to encourage word formation
@@ -6004,7 +6079,6 @@ function isMouseOverUI() {
 function isPointInRect(x, y, rect) {
   return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 }
-
 // ENHANCED: Function to draw the Focus/Resonance tool's visual representation with improved visual effects
 function drawFocusResonanceVisual() {
   if (focusResonanceActive && focusResonancePosition) {
@@ -6038,7 +6112,7 @@ function drawFocusResonanceVisual() {
     translate(focusResonancePosition.x, focusResonancePosition.y, focusResonancePosition.z);
     
     // Enhanced: Create a more complex pulsing effect with overlaid sine waves
-    let primaryPulseSpeed = CONFIG.wordSettings.focusResonancePulseSpeed || 0.05;
+    let primaryPulseSpeed = CONFIG.wordSettings.focusResonancePulseSpeed || 0.04;
     let secondaryPulseSpeed = primaryPulseSpeed * 1.7;
     let primaryPulse = map(sin(frameCount * primaryPulseSpeed), -1, 1, 0.85, 1.15);
     let secondaryPulse = map(sin(frameCount * secondaryPulseSpeed), -1, 1, -0.05, 0.05);
@@ -6064,7 +6138,7 @@ function drawFocusResonanceVisual() {
         fill(color[0], color[1], color[2], opacity * 0.2);
         stroke(color[0], color[1], color[2], opacity);
         strokeWeight(1.0 - (i * 0.15));
-  } else {
+      } else {
         noFill();
         // Use a slightly different color for alternating layers
         let altColor = [color[0] - 20, color[1] + 10, color[2] + 20];
@@ -6111,89 +6185,6 @@ function drawFocusResonanceVisual() {
     // Primary particle system
     drawEnergyParticles(displayRadius, color);
     
-    // Secondary particle system with different timing and color
-    let secondaryColor = [color[0] - 30, color[1] + 20, color[2] + 50]; // More blue-shifted
-    drawEnergyParticles(displayRadius * 0.8, secondaryColor, frameCount * 1.5, 8); // Additional particles
-    
-    // NEW: Enhanced visual effects for right-click word formation
-    if (useExtraEffects) {
-      // Add magnetic field-like effect
-      push();
-      noFill();
-      rotateY(frameCount * 0.01);
-      rotateX(frameCount * 0.005);
-      
-      // Pulsing magnetic field lines
-      for (let i = 0; i < 8; i++) {
-        let ringOpacity = map(sin(frameCount * 0.05 + i), -1, 1, 60, 120);
-        stroke(230, 230, 255, ringOpacity);
-        strokeWeight(0.8);
-        
-        // Draw rings with slight variations
-        let ringSize = displayRadius * (1.2 + i * 0.1);
-        let deform = sin(frameCount * 0.03 + i) * 0.2;
-        
-        // Create elliptical rings to simulate magnetic field
-        push();
-        rotateX(HALF_PI * 0.2 * (i/8));
-        rotateZ(i * 0.2);
-        ellipse(0, 0, ringSize * (1 + deform), ringSize * (1 - deform));
-        pop();
-      }
-      
-      // Add connecting lines to nearby organisms
-      nearbyOrganisms = organisms.filter(org => {
-        const distance = dist(org.pos.x, org.pos.y, org.pos.z, 
-                             focusResonancePosition.x, focusResonancePosition.y, focusResonancePosition.z);
-        return distance < focusResonanceRadius;
-      });
-      
-      // Only draw lines to organisms that match the current script highlight filter
-      const filteredOrganisms = nearbyOrganisms.filter(org => {
-        if (highlightedScriptCategory === "all_white") return true;
-        return org.scriptCategory === highlightedScriptCategory;
-      });
-      
-      // Draw connection lines
-      filteredOrganisms.forEach(org => {
-        let distance = dist(org.pos.x, org.pos.y, org.pos.z, 
-                           focusResonancePosition.x, focusResonancePosition.y, focusResonancePosition.z);
-        
-        let connectionOpacity = map(distance, 0, focusResonanceRadius, 200, 50);
-        strokeWeight(3);
-        
-        // Create lightning-like effect
-        let steps = floor(map(distance, 0, focusResonanceRadius, 3, 8));
-        let prevX = focusResonancePosition.x;
-        let prevY = focusResonancePosition.y;
-        let prevZ = focusResonancePosition.z;
-        
-        // Gold/yellow energy line
-        for (let s = 0; s <= steps; s++) {
-          let t = s / steps;
-          let nextX = lerp(focusResonancePosition.x, org.pos.x, t) + (s > 0 && s < steps ? random(-5, 5) : 0);
-          let nextY = lerp(focusResonancePosition.y, org.pos.y, t) + (s > 0 && s < steps ? random(-5, 5) : 0);
-          let nextZ = lerp(focusResonancePosition.z, org.pos.z, t) + (s > 0 && s < steps ? random(-5, 5) : 0);
-          
-          // Outer glow (wider, less opacity)
-          stroke(255, 220, 100, connectionOpacity * 0.3);
-          strokeWeight(4);
-          line(prevX, prevY, prevZ, nextX, nextY, nextZ);
-          
-          // Inner core (thinner, more opacity)
-          stroke(255, 240, 180, connectionOpacity);
-          strokeWeight(1.5);
-          line(prevX, prevY, prevZ, nextX, nextY, nextZ);
-          
-          prevX = nextX;
-          prevY = nextY;
-          prevZ = nextZ;
-        }
-      });
-      
-      pop();
-    }
-    
     // Add a subtle pulsing light at the very center
     let centerPulse = (sin(frameCount * 0.08) * 0.5 + 0.5);
     
@@ -6206,26 +6197,13 @@ function drawFocusResonanceVisual() {
     sphere(15 + 10 * centerPulse, 12, 12);
     pop();
     
-    // Add depth indicator line to show 3D position more clearly
-    push();
-    stroke(255, 255, 255, 40);
-    strokeWeight(1);
-    line(0, 0, 0, 0, 0, -500); // Line extending in z-direction
-    
-    // Add subtle ground reflection/shadow
-    translate(0, 0, -focusResonancePosition.z);
-    noStroke();
-    fill(color[0], color[1], color[2], 20);
-    ellipse(0, 0, displayRadius * 1.2, displayRadius * 0.6);
-    pop();
-    
     pop(); // Restore p5.js state
   }
 }
 
 // Helper function to draw energy particles around the focus/resonance sphere
 function drawEnergyParticles(radius, baseColor) {
-  let particleCount = CONFIG.wordSettings.focusResonanceParticles || 12; // Get from config or use default
+  let particleCount = CONFIG.wordSettings.focusResonanceParticles || 20; // Get from config or use default
   
   push();
   noStroke();
@@ -6663,49 +6641,3 @@ function drawLetterFlow() {
         }
     }
 }
-
-// Helper function to get color for script category
-function getColorForScript(scriptCategory) {
-    // Fallback color map if selectedPalette is not available
-    const colorMap = {
-        "latin": 0x3498db,      // blue
-        "greek": 0xe74c3c,      // red
-        "numbers": 0x2ecc71,    // green
-        "punctuation": 0x9b59b6, // purple
-        "default": 0xbdc3c7     // silver
-    };
-    
-    // Use colors from the current palette if available
-    if (selectedPalette && selectedPalette.length > 0) {
-        try {
-            // Create a consistent mapping from script categories to palette indices
-            // Get a hash-like number from the category string
-            const getStringHash = (str) => {
-                let hash = 0;
-                for (let i = 0; i < str.length; i++) {
-                    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                    hash = hash & hash; // Convert to 32bit integer
-                }
-                return Math.abs(hash); // Ensure positive number
-            };
-            
-            // Deterministically map each category to a palette color
-            const categoryHash = getStringHash(scriptCategory);
-            const paletteIndex = categoryHash % selectedPalette.length;
-            
-            // Convert p5 color array to hex
-            const color = selectedPalette[paletteIndex];
-            if (Array.isArray(color) && color.length >= 3) {
-                return (color[0] << 16) | (color[1] << 8) | color[2];
-            }
-        } catch (e) {
-            console.warn("Error using palette color:", e);
-        }
-    }
-    
-    // Fallback to fixed colors
-    return colorMap[scriptCategory] || colorMap.default;
-}
-
-
-
