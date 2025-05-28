@@ -3451,57 +3451,6 @@ window.zoomCamera = function (amount) {
   window.cameraZoom = cameraZoom;
 };
 
-// Add a test function to manually create a word
-window.createTestWord = function() {
-  console.log("Creating test word: 'test'");
-  
-  // Remove any existing organisms
-  while (organisms.length > 0) {
-    const org = organisms.pop();
-    if (org.mesh) {
-      org.removeMesh();
-    }
-  }
-  
-  // Create 4 organisms in a cluster spelling "test"
-  const centerX = 0;
-  const centerY = 0;
-  const letters = ['t', 'e', 's', 't'];
-  const spacing = 30;
-  
-  for (let i = 0; i < letters.length; i++) {
-    const x = centerX + (i - letters.length/2) * spacing;
-    const y = centerY;
-    
-    const org = new Organism(x, y);
-    org.textType = letters[i];
-    org.scriptCategory = 'default';
-    org.pos.z = 0;  // Set at center Z plane
-    
-    // Make them stable
-    org.vel = createVector(0, 0, 0);
-    org.acc = createVector(0, 0, 0);
-    
-    organisms.push(org);
-    org.createVisualRepresentation();
-  }
-  
-  console.log("Test word created. Organisms:", organisms.length);
-  
-  // Force check for word cluster immediately
-  setTimeout(() => {
-    console.log("Forcing word cluster check...");
-    
-    // Create a manual cluster ID and manually check word validity
-    const testCluster = organisms.slice(0, 4);
-    const testClusterId = testCluster.map(org => org.id).join(',');
-    const testWord = testCluster.map(org => org.textType).join('');
-    
-    console.log(`Manual test - Checking word: "${testWord}" (ID: ${testClusterId})`);
-    checkWordValidity(testClusterId, testWord, testCluster, millis(), true, 'default');
-  }, 1000);
-};
-
 // Create initial organisms for the 3D environment - ENHANCED for better word formation
 function initializeOrganisms() {
   // Use a larger initial set as specified in CONFIG
@@ -4046,7 +3995,7 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
       "same", "saw", "say", "school", "sea", "second", "see", "seem", "seen", "self", "sentence", 
       "set", "several", "shall", "she", "ship", "short", "should", "show", "side", "simple", "since", 
       "sing", "sit", "six", "size", "sleep", "slow", "small", "snow", "so", "some", "something", 
-      "song", "soon", "sound", "south", "spell", "stand", "star", "start", "state", "stay", "step", 
+      "song", "soon", "sound", "south", "spell", "start", "state", "stay", "step", 
       "still", "stop", "story", "street", "strong", "study", "such", "sun", "sure", "table", "take", 
       "talk", "tell", "ten", "than", "that", "the", "their", "them", "then", "there", "these", 
       "they", "thing", "think", "this", "those", "though", "thought", "thousand", "three", "through", 
@@ -5213,23 +5162,6 @@ function setupUI() {
   wordListContent.style.height = Math.max(20, contentHeightCalc) + 'px'; // Ensure a minimum height
   wordListContent.style.overflowY = 'auto'; // Make this part scrollable
   wordListBox.appendChild(wordListContent);
-  
-  // Add test word button
-  const testWordButton = document.createElement("button");
-  testWordButton.id = "test-word-button";
-  testWordButton.textContent = "Create Test Word";
-  testWordButton.style.position = "fixed";
-  testWordButton.style.top = "10px";
-  testWordButton.style.right = "10px";
-  testWordButton.style.zIndex = "1000";
-  testWordButton.style.padding = "8px 16px";
-  testWordButton.style.backgroundColor = "#4CAF50";
-  testWordButton.style.color = "white";
-  testWordButton.style.border = "none";
-  testWordButton.style.borderRadius = "4px";
-  testWordButton.style.cursor = "pointer";
-  testWordButton.onclick = window.createTestWord;
-  document.body.appendChild(testWordButton);
 }
 
 // Mouse click in 3D space
