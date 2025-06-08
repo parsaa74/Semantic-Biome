@@ -1,6 +1,225 @@
 // Semantic Biome (3D Version)
 let threeScene, threeCamera, threeRenderer, threeFont, wordCountEl, totalScoreEl, avgDepthEl, fpsEl, cameraModeEl, targetFpsEl, wordListTitle, wordListContent;
 
+// Enhanced Word Generation System
+// ============================================
+
+// Comprehensive English word dictionary - consolidated from all sources
+const COMPREHENSIVE_WORD_DICTIONARY = [
+  // 2-letter words
+  "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in", "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we",
+  
+  // 3-letter words
+  "all", "and", "any", "are", "art", "bad", "big", "boy", "but", "can", "car", "cat", "day", "did", "dog", "eat", "end", "eye", "far", "few", "for", "fun", "get", "god", "got", "had", "has", "hat", "her", "him", "his", "hot", "how", "ice", "job", "key", "law", "let", "low", "man", "may", "new", "not", "now", "old", "one", "our", "out", "own", "pen", "put", "ran", "red", "run", "saw", "say", "sea", "see", "she", "sit", "sky", "sun", "ten", "the", "too", "top", "try", "two", "use", "war", "was", "way", "who", "why", "win", "yes", "yet", "you",
+  
+  // 4-letter words
+  "able", "back", "ball", "base", "bear", "beat", "been", "best", "blue", "boat", "body", "book", "both", "came", "call", "care", "case", "city", "come", "cool", "dark", "data", "date", "dear", "deep", "does", "done", "door", "down", "draw", "drop", "each", "easy", "even", "ever", "face", "fact", "fall", "fast", "feel", "feet", "file", "fill", "find", "fine", "fire", "fish", "five", "food", "foot", "form", "four", "free", "from", "full", "game", "give", "glad", "gold", "gone", "good", "gray", "grew", "grow", "hair", "half", "hand", "hard", "have", "head", "hear", "heat", "help", "here", "high", "hold", "home", "hope", "hour", "idea", "into", "join", "jump", "just", "keep", "kind", "know", "land", "last", "late", "left", "life", "line", "live", "long", "look", "lose", "love", "made", "make", "many", "mark", "mean", "meet", "mind", "miss", "moon", "more", "most", "move", "much", "must", "name", "near", "need", "next", "nice", "nine", "open", "over", "page", "part", "plan", "play", "poor", "push", "read", "real", "rest", "rich", "ride", "road", "rock", "room", "said", "same", "seat", "seem", "self", "send", "ship", "show", "side", "size", "snow", "some", "song", "soon", "stop", "such", "sure", "take", "talk", "tell", "than", "that", "them", "then", "they", "this", "thus", "time", "told", "took", "tree", "true", "turn", "very", "walk", "want", "warm", "wave", "ways", "week", "well", "went", "were", "what", "when", "will", "wind", "wish", "with", "wood", "word", "work", "year", "your",
+  
+  // 5-letter words
+  "about", "above", "after", "again", "among", "anger", "angry", "apple", "asked", "basic", "beach", "began", "begin", "being", "below", "birth", "black", "blood", "board", "bring", "broad", "brown", "build", "built", "carry", "catch", "cause", "chair", "chart", "check", "child", "china", "chose", "civil", "class", "clean", "clear", "click", "clock", "close", "cloud", "color", "could", "count", "court", "cover", "craft", "crazy", "cream", "cross", "crowd", "cycle", "daily", "dance", "death", "depth", "doing", "doubt", "dozen", "drama", "drawn", "dream", "dress", "drink", "drive", "drove", "dying", "eager", "early", "earth", "eight", "empty", "enemy", "enjoy", "enter", "entry", "equal", "error", "event", "every", "exact", "exist", "extra", "faith", "false", "fault", "field", "fifth", "fifty", "fight", "final", "first", "fixed", "flash", "floor", "focus", "force", "forth", "forty", "found", "frame", "frank", "fresh", "front", "fruit", "fully", "funny", "glass", "grace", "grade", "grand", "grant", "grass", "great", "green", "gross", "group", "grown", "guard", "guess", "guide", "happy", "heart", "heavy", "horse", "hotel", "house", "human", "hurry", "image", "index", "inner", "input", "issue", "japan", "joint", "judge", "known", "label", "large", "laser", "later", "laugh", "layer", "learn", "least", "leave", "legal", "level", "light", "limit", "links", "lived", "local", "loose", "lower", "lucky", "lunch", "lying", "magic", "major", "maker", "march", "match", "maybe", "mayor", "meant", "media", "metal", "might", "minor", "minus", "mixed", "model", "money", "month", "moral", "motor", "mount", "mouse", "mouth", "moved", "movie", "music", "needs", "never", "newer", "night", "noise", "north", "noted", "novel", "nurse", "occur", "ocean", "offer", "often", "order", "other", "ought", "owner", "paint", "panel", "paper", "party", "peace", "phase", "phone", "photo", "piano", "piece", "pilot", "pitch", "place", "plain", "plane", "plant", "plate", "point", "pound", "power", "press", "price", "pride", "prime", "print", "prior", "prize", "proof", "proud", "prove", "queen", "quick", "quiet", "quite", "radio", "raise", "range", "rapid", "ratio", "reach", "ready", "realm", "rebel", "refer", "relax", "repay", "reply", "right", "rigid", "river", "robot", "roger", "roman", "rough", "round", "route", "royal", "rural", "scale", "scene", "scope", "score", "sense", "serve", "setup", "seven", "shade", "shake", "shall", "shame", "shape", "share", "sharp", "sheet", "shelf", "shell", "shift", "shine", "shirt", "shock", "shoot", "short", "shown", "sides", "sight", "silly", "since", "sixth", "sixty", "sized", "skill", "sleep", "slide", "small", "smart", "smile", "smith", "smoke", "snake", "solid", "solve", "sorry", "sound", "south", "space", "spare", "speak", "speed", "spend", "spent", "split", "spoke", "sport", "staff", "stage", "stake", "stand", "start", "state", "steam", "steel", "steep", "steer", "stick", "still", "stock", "stone", "stood", "store", "storm", "story", "strip", "stuck", "study", "stuff", "style", "sugar", "suite", "super", "sweet", "swift", "swing", "sword", "table", "taken", "taste", "taxes", "teach", "teeth", "texas", "thank", "theft", "their", "theme", "there", "these", "thick", "thing", "think", "third", "those", "three", "threw", "throw", "thumb", "tight", "timer", "title", "today", "topic", "total", "touch", "tough", "tower", "track", "trade", "train", "treat", "trend", "trial", "tribe", "trick", "tried", "tries", "truck", "truly", "trust", "truth", "twice", "twist", "uncle", "under", "undue", "union", "unity", "until", "upper", "upset", "urban", "usage", "usual", "valid", "value", "video", "virus", "visit", "vital", "vocal", "voice", "waste", "watch", "water", "wheel", "where", "which", "while", "white", "whole", "whose", "woman", "women", "world", "worry", "worse", "worst", "worth", "would", "write", "wrong", "wrote", "young", "youth",
+  
+  // Poetry and creative words
+  "creative", "design", "poem", "poetry", "verse", "rhyme", "rhythm", "metaphor", "image", 
+  "life", "dream", "flow", "nature", "mind", "idea", "form", "light", "dark", "space", "echo", 
+  "voice", "sound", "color", "shape", "move", "pulse", "wave", "energy", "being", "soul", 
+  "earth", "water", "fire", "void", "chaos", "order", "beauty", "grace", "harmony", "melody",
+  
+  // Additional anagram words for better formation
+  "stale", "steal", "tales", "least", "paste", "pates", "spate", "tapes", "rates", "stare", 
+  "tears", "tares", "stair", "reign", "stole", "shot", "host", "pots", "spot", "stop", "tops", 
+  "cart", "date", "hear", "hare", "heart", "leap", "pale", "peal", "plea", "mean", "name", 
+  "mane", "earn", "near", "east", "eats", "seat", "teas", "heat", "hate", "hart", "mail", 
+  "vail", "vial", "pain", "alto", "mast", "snap", "span", "pant", "rant", "tarn", "ants", 
+  "like", "evil", "live", "veil", "vile", "lime", "mile", "mine", "mire", "site", "ties", 
+  "tide", "tied", "love", "vole", "more", "rome", "rent", "tern", "poets", "fire", "fowl", 
+  "wolf", "taped", "pated", "adept", "great", "grate", "hats", "shat", "saint", "stain", 
+  "satin", "born", "lord", "wire", "rose", "sore", "lapse", "pales", "leaps", "range", 
+  "anger", "soft", "thing", "will", "limp", "walk", "work", "time", "item", "mite", "must", 
+  "word", "push", "this", "hits", "that", "tight", "might", "right", "light", "night"
+];
+
+// Advanced letter permutation and combination generator
+class EnhancedWordGenerator {
+  constructor() {
+    this.dictionary = new Set(COMPREHENSIVE_WORD_DICTIONARY.map(word => word.toLowerCase()));
+    this.cache = new Map(); // Cache for performance
+    console.log(`📚 Initialized word dictionary with ${this.dictionary.size} words`);
+  }
+
+  // Generate all possible words from a set of letters
+  generatePossibleWords(letters, minLength = 2, maxLength = 5) {
+    if (!letters || letters.length < minLength) return [];
+    
+    const cacheKey = `${letters}-${minLength}-${maxLength}`;
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
+    const letterArray = letters.toLowerCase().split('');
+    const foundWords = new Set();
+    
+    // Generate all permutations and check against dictionary
+    this.generatePermutations(letterArray, minLength, maxLength, foundWords);
+    
+    // Generate all combinations (subsets) and check their permutations
+    this.generateCombinations(letterArray, minLength, maxLength, foundWords);
+    
+    // Convert to sorted array (longer words first)
+    const result = Array.from(foundWords).sort((a, b) => b.length - a.length);
+    
+    // Cache the result
+    this.cache.set(cacheKey, result);
+    
+    return result;
+  }
+
+  // Generate all permutations of given length from letters
+  generatePermutations(letters, minLength, maxLength, foundWords) {
+    const used = new Array(letters.length).fill(false);
+    const currentWord = [];
+    
+    const backtrack = () => {
+      if (currentWord.length >= minLength && currentWord.length <= maxLength) {
+        const word = currentWord.join('');
+        if (this.dictionary.has(word)) {
+          foundWords.add(word);
+        }
+      }
+      
+      if (currentWord.length >= maxLength) return;
+      
+      for (let i = 0; i < letters.length; i++) {
+        if (!used[i]) {
+          used[i] = true;
+          currentWord.push(letters[i]);
+          backtrack();
+          currentWord.pop();
+          used[i] = false;
+        }
+      }
+    };
+    
+    backtrack();
+  }
+
+  // Generate combinations (subsets) and check their permutations
+  generateCombinations(letters, minLength, maxLength, foundWords) {
+    const n = letters.length;
+    
+    // Generate all possible subsets using bit manipulation
+    for (let mask = 1; mask < (1 << n); mask++) {
+      const subset = [];
+      for (let i = 0; i < n; i++) {
+        if (mask & (1 << i)) {
+          subset.push(letters[i]);
+        }
+      }
+      
+      if (subset.length >= minLength && subset.length <= maxLength) {
+        // Generate all permutations of this subset
+        this.generatePermutationsOfArray(subset, foundWords);
+      }
+    }
+  }
+
+  // Generate all permutations of a specific array
+  generatePermutationsOfArray(array, foundWords) {
+    if (array.length === 0) return;
+    
+    const permute = (arr, start = 0) => {
+      if (start === arr.length) {
+        const word = arr.join('');
+        if (this.dictionary.has(word)) {
+          foundWords.add(word);
+        }
+        return;
+      }
+      
+      for (let i = start; i < arr.length; i++) {
+        [arr[start], arr[i]] = [arr[i], arr[start]]; // Swap
+        permute(arr, start + 1);
+        [arr[start], arr[i]] = [arr[i], arr[start]]; // Swap back
+      }
+    };
+    
+    permute([...array]); // Create a copy to avoid modifying the original
+  }
+
+  // Special method to force 5-letter word generation
+  generate5LetterWords(letters) {
+    return this.generatePossibleWords(letters, 5, 5);
+  }
+
+  // Method to generate words prioritizing longer lengths
+  generateLongestWords(letters, priorityLength = 5) {
+    const allWords = this.generatePossibleWords(letters, 2, 8);
+    
+    // Prioritize words of the desired length
+    const priorityWords = allWords.filter(word => word.length === priorityLength);
+    const otherWords = allWords.filter(word => word.length !== priorityLength);
+    
+    return [...priorityWords, ...otherWords];
+  }
+
+  // Check if a word exists in our dictionary
+  isValidWord(word) {
+    return this.dictionary.has(word.toLowerCase());
+  }
+
+  // Get word suggestions based on partial letters
+  getSuggestions(partialLetters, targetLength = null) {
+    const letters = partialLetters.toLowerCase();
+    const suggestions = [];
+    
+    for (const word of this.dictionary) {
+      if (targetLength && word.length !== targetLength) continue;
+      
+      // Check if the word can be formed with available letters
+      if (this.canFormWord(word, letters)) {
+        suggestions.push(word);
+      }
+    }
+    
+    return suggestions.sort((a, b) => b.length - a.length).slice(0, 20);
+  }
+
+  // Check if a word can be formed from available letters
+  canFormWord(word, availableLetters) {
+    const wordLetters = {};
+    const available = {};
+    
+    // Count letters in the word
+    for (const letter of word) {
+      wordLetters[letter] = (wordLetters[letter] || 0) + 1;
+    }
+    
+    // Count available letters
+    for (const letter of availableLetters) {
+      available[letter] = (available[letter] || 0) + 1;
+    }
+    
+    // Check if we have enough of each letter
+    for (const [letter, count] of Object.entries(wordLetters)) {
+      if (!available[letter] || available[letter] < count) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+}
+
+// Global enhanced word generator instance
+const enhancedWordGenerator = new EnhancedWordGenerator();
+
+// Test the word generator to make sure it works
+console.log("Testing enhanced word generator...");
+console.log("Testing 'cat':", enhancedWordGenerator.isValidWord("cat"));
+console.log("Testing 'dog':", enhancedWordGenerator.isValidWord("dog"));
+console.log("Testing 'art':", enhancedWordGenerator.isValidWord("art"));
+console.log("Generating words from 'cat':", enhancedWordGenerator.generatePossibleWords("cat"));
+console.log("Generating words from 'art':", enhancedWordGenerator.generatePossibleWords("art"));
+
 // NEW: Variables for letter flow visualization
 let letterOrgData = []; // Array to store letter organism data
 let maxLetters = 400;   // Maximum number of letters to display
@@ -28,11 +247,11 @@ const CONFIG = {
   // Word and Poetry Settings
   wordSettings: {
     minClusterSize: 2, // Allow just 2 characters to form a word
-    maxClusterSize: 5, // Reduced to allow shorter words
+    maxClusterSize: 8, // Increased to allow longer words like "about", "world", etc.
     clusterFormationRadiusFactor: 50.0, // Drastically increased to force clusters to form
-    clusterStabilityTime: 300,    // Further reduced to check clusters even faster
-    apiCooldownDictionary: 200, // Greatly reduced for more frequent checks
-    apiCooldownTranslation: 200, // Greatly reduced for more frequent checks
+    clusterStabilityTime: 100,    // Reduced to 100ms for faster word detection
+    apiCooldownDictionary: 50, // Greatly reduced for more frequent checks
+    apiCooldownTranslation: 50, // Greatly reduced for more frequent checks
     maxCollectedWords: 100,        // Max words in Poet's Palette
     wordDisplayTime3D: 15000,     // ms to display a confirmed word in 3D
     forceClusterFormation: true,  // Force clusters to form even if far apart
@@ -61,6 +280,10 @@ const CONFIG = {
   
   // Script to font mapping
   scriptMap: {
+    // Explicitly map all English letters to "default" to ensure proper categorization
+    "A": "default", "B": "default", "C": "default", "D": "default", "E": "default", "F": "default", "G": "default", "H": "default", "I": "default", "J": "default", "K": "default", "L": "default", "M": "default", "N": "default", "O": "default", "P": "default", "Q": "default", "R": "default", "S": "default", "T": "default", "U": "default", "V": "default", "W": "default", "X": "default", "Y": "default", "Z": "default",
+    "a": "default", "b": "default", "c": "default", "d": "default", "e": "default", "f": "default", "g": "default", "h": "default", "i": "default", "j": "default", "k": "default", "l": "default", "m": "default", "n": "default", "o": "default", "p": "default", "q": "default", "r": "default", "s": "default", "t": "default", "u": "default", "v": "default", "w": "default", "x": "default", "y": "default", "z": "default",
+    
     // Latin-based characters for English, Spanish, French, Portuguese, German, Indonesian/Malay
     // (Many will be caught by the default Unicode block checks in getScriptCategory,
     // but explicit mapping for common accented chars can be helpful)
@@ -364,6 +587,14 @@ let potentialClusters = new Map(); // Map cluster ID -> {organisms: [], startTim
 let confirmedWords = []; // Array of {word: string, organisms: [], displayUntil: timestamp}
 let collectedWords = []; // Array of {word: string, definition: string, translations: {}}
 let lastDictionaryCheck = 0; // Timestamp of last dictionary API call
+
+// Verse creation mode variables
+let isVerseMode = false; // Toggle between letter mode and verse mode
+let verseWords = []; // Array of {word: string, position: {x, y, z}, rotation: {x, y, z}, scale: number, id: number}
+let verses = []; // Array of saved verses: {title: string, words: [], createdAt: timestamp}
+let selectedWordForPlacement = null; // Word selected from palette to place in 3D space
+let nextVerseWordId = 0; // Unique ID counter for verse words
+let currentVerse = { title: "Untitled Verse", words: [] }; // Current verse being worked on
 
 // Sophisticated color palettes curated for the exhibition
 const PALETTES = [
@@ -838,6 +1069,108 @@ function setup() {
   
   // Set up letter destination regions based on scripts
   setupLetterFlowDestinations();
+
+    // Initialize the Word List display immediately
+  updateWordList();
+  
+  console.log("Setup complete - UI initialized");
+  console.log("Word collection system ready");
+  
+  // Add a test function to verify word collection works
+  window.testWordCollection = function() {
+    console.log("🧪 Testing word collection system...");
+    
+    // Add a test word to demonstrate the system works
+    const testWord = {
+      word: "test",
+      definition: "A test word to verify the collection system",
+      translations: {},
+      timestamp: millis(),
+      source: "manual-test"
+    };
+    
+    collectedWords.push(testWord);
+    console.log("✅ Test word added to collection");
+    updateWordList();
+    console.log("🔄 Word list updated");
+  };
+  
+  // Add a function to manually create words for testing
+  window.createTestWord = function(word = "hello") {
+    console.log(`🎯 Creating test word: "${word}"`);
+    
+    // Simulate the confirmWord process
+    const currentTime = millis();
+    const definition = `Test word: ${word}`;
+    
+    // Create fake organisms for the word
+    const fakeOrganisms = [];
+    for (let i = 0; i < word.length; i++) {
+      fakeOrganisms.push({
+        id: Date.now() + i,
+        textType: word[i],
+        pos: { x: i * 50, y: 0, z: 0 }
+      });
+    }
+    
+    // Call confirmWord directly
+    confirmWord(`test-${Date.now()}`, word, fakeOrganisms, currentTime, definition, 'default', 'english');
+  };
+  
+  // Test the system after 2 seconds
+  setTimeout(() => {
+    console.log("🔍 Checking if word collection UI exists...");
+    const wordListBox = document.getElementById('wordListBox');
+    const wordListContent = document.getElementById('wordListContent');
+    
+    if (wordListBox) {
+      console.log("✅ Word collection box found");
+    } else {
+      console.error("❌ Word collection box NOT found");
+    }
+    
+    if (wordListContent) {
+      console.log("✅ Word list content area found");
+    } else {
+      console.error("❌ Word list content area NOT found");
+    }
+    
+    console.log("💡 You can manually test word collection by typing:");
+    console.log("   - testWordCollection() - adds a simple test word");
+    console.log("   - createTestWord('hello') - creates a specific word");
+    console.log("   - clearWordCollection() - clears all collected words");
+    console.log("   - restartWithEnglish() - restart with English-prioritized organisms");
+  }, 2000);
+  
+  // Add a function to clear the word collection
+  window.clearWordCollection = function() {
+    console.log("🗑️ Clearing word collection...");
+    collectedWords.length = 0; // Clear the array
+    updateWordList();
+    console.log("✅ Word collection cleared");
+  };
+  
+  // Add a function to restart with English-prioritized organisms
+  window.restartWithEnglish = function() {
+    console.log("🔄 Restarting with English-prioritized organisms...");
+    
+    // Clear existing organisms
+    while (organisms.length > 0) {
+      const org = organisms.pop();
+      if (org.mesh) {
+        org.removeMesh();
+      }
+    }
+    
+    // Clear confirmed words and potential clusters
+    confirmedWords = [];
+    potentialClusters.clear();
+    
+    // Re-initialize with English priority
+    initializeOrganisms();
+    
+    console.log("✅ Restarted with English-prioritized organisms");
+  };
 }
 
 // NEW: Function to set up letter flow destinations
@@ -946,6 +1279,9 @@ function mouseMoved() {
     }
 
   if (isMouseOverUI()) return;
+  
+  // Don't generate letters in verse mode - verse mode is for placing complete words only
+  if (isVerseMode) return;
     
     // Create a new letter organism at the mouse position
     if (letterIndex >= 0) {
@@ -1225,57 +1561,64 @@ class Organism {
     // Mesh for THREE.js rendering
     this.mesh = null;
     
-    // Determine text type - ENHANCED character selection logic for better word formation
-    // Almost exclusively use text characters for better word generation
+    // Determine text type - ENHANCED character selection logic for multilingual character generation
+    // Almost exclusively use text characters for better generation
     const useTextCharacter = random() < 0.98; // 98% chance to use text characters
     
     if (useTextCharacter) {
-      // Use optimized letter distribution to form common words more easily
-      // Force Latin script / English letters to maximize word formation
+      // Create a diverse multilingual character pool including Arabic/Persian
+      const multilingualCharacterPool = [];
       
-      // Enhanced letter frequency distribution based on common English words
-      // This will be weighted to increase the likelihood of forming valid words
-      const commonLetterPool = [
-        // High-frequency vowels - essential for word formation
-        "a", "a", "a", "a", "a", "a",  // ~9% frequency
-        "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", // ~12% frequency - most common
-        "i", "i", "i", "i", "i", "i", "i", // ~7% frequency
-        "o", "o", "o", "o", "o", "o", "o", // ~7.5% frequency
-        "u", "u", "u", // ~2.5% frequency
-        
-        // High-frequency consonants - carefully weighted by English frequency
-        "t", "t", "t", "t", "t", "t", "t", "t", // ~9% - very common
-        "n", "n", "n", "n", "n", "n", // ~7%
-        "s", "s", "s", "s", "s", "s", // ~6%
-        "r", "r", "r", "r", "r", "r", // ~6%
-        "h", "h", "h", "h", "h", // ~5%
-        "l", "l", "l", "l", // ~4%
-        "d", "d", "d", "d", // ~4%
-        "c", "c", "c", // ~3%
-        "m", "m", "m", // ~3%
-        "f", "f", // ~2%
-        "w", "w", // ~2%
-        "g", "g", // ~2%
-        "p", "p", // ~2%
-        "b", "b", // ~1.5%
-        "v", "v", // ~1%
-        "k", "k", // ~0.8%
-        "j", // ~0.2%
-        "x", // ~0.2%
-        "q", // ~0.1%
-        "z", // ~0.1%
-        
-        // Some common digraphs (two-letter combinations) that often appear in words
-        // This increases the chance of generating valid words
-        "th", "he", "an", "in", "er", "on", "re", "ed", "nd", "ha", "at", "en", "es", "of", "or",
-        "is", "it", "al", "ar", "st", "to", "nt", "ng", "se", "me", "de"
+      // Common English letters (40% weight)
+      const commonEnglishLetters = [
+        // High-frequency vowels
+        "a", "a", "a", "e", "e", "e", "e", "i", "i", "o", "o", "u",
+        // High-frequency consonants
+        "t", "t", "n", "n", "s", "s", "r", "r", "h", "l", "d", "c", "m", "p", "b", "f", "g", "w", "v", "k", "j", "x", "q", "z"
       ];
-     
-      // Use only English/Latin letters for better word formation
-      this.dna.type = random(commonLetterPool);
       
-      // Force script category to default (Latin/English) for better word formation
-      this.scriptCategory = "default";
+      // Common Arabic letters (40% weight)
+      const commonArabicLetters = [
+        "ا", "ا", "ا", // Alif - very common
+        "ب", "ب", "ت", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ر", "ز", "س", "س", "ش", "ص", "ض", "ط", "ظ",
+        "ع", "ع", "غ", "ف", "ق", "ک", "ک", "ل", "ل", "م", "م", "ن", "ن", "ه", "ه", "و", "و", "ی", "ی",
+        // Persian-specific letters
+        "پ", "چ", "ژ", "گ",
+        // Common Arabic variants
+        "آ", "أ", "إ", "ة", "ى"
+      ];
+      
+      // Other script letters (20% weight)
+      const otherScriptLetters = [
+        // Chinese
+        "你", "好", "我", "是", "的", "人", "中", "国", "爱", "学",
+        // Hindi
+        "अ", "आ", "इ", "क", "ख", "ग", "म", "न", "र", "स",
+        // Russian
+        "а", "б", "в", "г", "д", "е", "и", "к", "л", "м", "н", "о", "п", "р", "с", "т"
+      ];
+      
+      // Build the multilingual pool with proper weights
+      // 40% English
+      for (let i = 0; i < 4; i++) {
+        multilingualCharacterPool.push(...commonEnglishLetters);
+      }
+      
+      // 40% Arabic/Persian
+      for (let i = 0; i < 4; i++) {
+        multilingualCharacterPool.push(...commonArabicLetters);
+      }
+      
+      // 20% Other scripts
+      for (let i = 0; i < 2; i++) {
+        multilingualCharacterPool.push(...otherScriptLetters);
+      }
+      
+      // Select character from the multilingual pool
+      this.dna.type = random(multilingualCharacterPool);
+      
+      // Determine script category for the selected character
+      this.scriptCategory = this.getScriptCategory(this.dna.type);
     } else {
       // Rarely use geometric shapes
       this.dna.type = random(["circle", "triangle", "square", "spiral", "asterisk", "cross"]);
@@ -1633,6 +1976,11 @@ class Organism {
       this.mesh = new THREE.Mesh(fallbackGeom, fallbackMat);
     }
 
+    // Mark this mesh as a letter organism for identification during cleanup
+    if (this.mesh) {
+      this.mesh.userData = { isLetterOrganism: true, organismId: this.id };
+    }
+    
     // Add the mesh to the THREE.js scene
     try {
       if (threeScene) threeScene.add(this.mesh);
@@ -1642,6 +1990,8 @@ class Organism {
   }
 
   update(localDensity = 0) {
+    // Word formation bias - organisms are attracted to others that would form common words
+    this.applyWordFormationBias();
     // 3D movement and update
     this.vel.add(this.acc);
     this.vel.limit(this.dna.speed);
@@ -2177,6 +2527,66 @@ class Organism {
     this.acc.add(f);
   }
 
+  // Word formation bias - attract organisms toward others that would form common words
+  applyWordFormationBias() {
+    if (!this.textType) return;
+    
+    const searchRadius = CONFIG.connectionDistance * 2; // Use a larger radius for word formation
+    const wordFormationForce = 0.02; // Gentle attraction force
+    
+    // Common word patterns that this organism could help complete
+    const commonStartingWords = {
+      't': ['the', 'to', 'that', 'this', 'then', 'they', 'time', 'take', 'tell', 'talk', 'turn', 'try', 'top', 'two', 'ten'],
+      'a': ['and', 'all', 'are', 'an', 'as', 'at', 'any', 'ask', 'art', 'add', 'act', 'age', 'air', 'arm'],
+      'w': ['with', 'will', 'was', 'were', 'what', 'when', 'who', 'why', 'way', 'we', 'well', 'went', 'want', 'work', 'word', 'world', 'water', 'war', 'win'],
+      'f': ['for', 'from', 'first', 'find', 'feel', 'far', 'fast', 'full', 'fun', 'fire', 'fish', 'five', 'four', 'fly', 'face'],
+      'h': ['his', 'her', 'he', 'have', 'had', 'has', 'how', 'here', 'help', 'hand', 'home', 'house', 'hope', 'head', 'heart', 'high', 'hot'],
+      'i': ['is', 'it', 'in', 'if', 'into', 'its', 'idea', 'ice'],
+      's': ['she', 'say', 'see', 'so', 'some', 'such', 'said', 'same', 'still', 'show', 'small', 'sun', 'sea', 'sit', 'set', 'six'],
+      'b': ['but', 'be', 'been', 'by', 'big', 'boy', 'back', 'best', 'book', 'both', 'box', 'bad', 'buy', 'ball'],
+      'c': ['can', 'come', 'could', 'call', 'came', 'car', 'cat', 'cut', 'city', 'close', 'cold', 'color'],
+      'n': ['not', 'now', 'new', 'no', 'name', 'need', 'next', 'near', 'never', 'nine', 'night'],
+      'o': ['one', 'of', 'on', 'or', 'out', 'our', 'over', 'old', 'only', 'open', 'other', 'own'],
+      'l': ['like', 'look', 'long', 'last', 'let', 'love', 'life', 'live', 'left', 'light', 'line', 'little', 'low'],
+      'g': ['get', 'go', 'give', 'got', 'good', 'great', 'girl', 'game', 'green', 'ground', 'group'],
+      'm': ['make', 'may', 'me', 'my', 'man', 'much', 'more', 'most', 'made', 'many', 'must', 'move', 'mind', 'money', 'mother', 'moon'],
+      'y': ['you', 'your', 'yes', 'yet', 'year', 'young'],
+      'd': ['do', 'day', 'did', 'down', 'does', 'door', 'dog', 'draw', 'dream', 'drive', 'drop', 'dry', 'dark'],
+      'p': ['play', 'put', 'part', 'people', 'place', 'point', 'power', 'paper', 'page', 'pay', 'poor', 'push'],
+      'r': ['run', 'right', 'read', 'real', 'room', 'red', 'road', 'rock', 'rain', 'rise', 'rich', 'round'],
+      'k': ['know', 'keep', 'kind', 'key', 'king', 'kill'],
+      'j': ['just', 'job', 'jump', 'join', 'joy'],
+      'v': ['very', 'voice', 'visit', 'view', 'value'],
+      'u': ['up', 'us', 'use', 'under', 'until', 'upon', 'usual'],
+      'e': ['end', 'even', 'ever', 'every', 'each', 'early', 'earth', 'eat', 'eye', 'easy']
+    };
+    
+    const myChar = this.textType.toLowerCase();
+    const targetWords = commonStartingWords[myChar] || [];
+    
+    if (targetWords.length === 0) return;
+    
+    // Look for nearby organisms that could help form these words
+    for (let other of organisms) {
+      if (other === this || !other.textType) continue;
+      
+      const d = dist(this.pos.x, this.pos.y, this.pos.z, other.pos.x, other.pos.y, other.pos.z);
+      if (d > searchRadius) continue;
+      
+      // Check if this organism could help complete any target words
+      for (let targetWord of targetWords) {
+        if (targetWord.length > 1 && targetWord[1] === other.textType.toLowerCase()) {
+          // Found a potential word completion, apply attractive force
+          let force = p5.Vector.sub(other.pos, this.pos);
+          force.normalize();
+          force.mult(wordFormationForce);
+          this.applyForce(force);
+          break; // Only apply one word formation force per organism
+        }
+      }
+    }
+  }
+
   // Check if organism has died
   isDead() {
     return this.age > this.dna.lifespan || this.energy <= 0;
@@ -2265,61 +2675,72 @@ class Organism {
           this.dna.colorIndex = floor(random(selectedPalette.length));
           break;
         case "type":
-          // For type mutation, try to pick a character from the same script
+          // For type mutation, use the same multilingual character pool as constructor
           const currentScript = this.scriptCategory;
           
-          // Special handling for English/default script to ensure we only use alphabetic characters
-          if (currentScript === 'default') {
-            // 90% chance to stay as an English letter when already an English letter
-            const englishLetters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-            // Choose more common letters for better word formation
-            const commonEnglishLetters = ['a', 'e', 'i', 'o', 'u', 't', 'n', 's', 'r', 'l', 'c', 'd', 'p', 'm'];
+          // 60% chance to stay within the same script family
+          if (random() < 0.6) {
+            // Find all characters from the same script
+            const sameScriptChars = CONFIG.types.filter(char => 
+              this.getScriptCategory(char) === currentScript
+            );
             
-            // Bias toward common letters
-            const letter = random() < 0.7 ? 
-              random(commonEnglishLetters) : 
-              random(englishLetters);
-              
-            this.dna.type = letter;
-            this.textType = letter;
-            
-            // Recreate visual with new character
-            if (this.mesh) {
-              this.removeMesh();
-            }
-            this.createVisualRepresentation();
-          }
-          // For non-English scripts
-          else {
-            // 30% chance to completely change script
-            if (random() < 0.3) {
+            if (sameScriptChars.length > 0) {
+              this.dna.type = random(sameScriptChars);
+              this.textType = this.dna.type;
+            } else {
+              // Fallback to random character from CONFIG.types
               this.dna.type = random(CONFIG.types);
               this.textType = this.dna.type;
               this.scriptCategory = this.getScriptCategory(this.textType);
-              
-              // Recreate visual with new character
-              if (this.mesh) {
-                this.removeMesh();
-              }
-              this.createVisualRepresentation();
-            } else {
-              // 70% chance to stay within same script family
-              const sameScriptChars = CONFIG.types.filter(char => 
-                this.getScriptCategory(char) === currentScript
-              );
-              
-              if (sameScriptChars.length > 0) {
-                this.dna.type = random(sameScriptChars);
-                this.textType = this.dna.type;
-                
-                // Recreate visual with new character
-                if (this.mesh) {
-                  this.removeMesh();
-                }
-                this.createVisualRepresentation();
-              }
             }
+          } else {
+            // 80% chance to use English letters (increased from 40% for better word formation)
+            const multilingualCharacterPool = [];
+            
+            // Common English letters - heavily weighted toward most frequent letters
+            const commonEnglishLetters = [
+              // Vowels - very high frequency for word formation
+              "a", "a", "a", "a", "a", "a", "e", "e", "e", "e", "e", "e", "e", "e", "i", "i", "i", "i", "o", "o", "o", "o", "u", "u", "u",
+              // Most common consonants for popular words
+              "t", "t", "t", "t", "t", "n", "n", "n", "n", "s", "s", "s", "s", "r", "r", "r", "r", "h", "h", "h", "l", "l", "l", "d", "d", "d", 
+              // Common word starters and connectors
+              "c", "c", "c", "m", "m", "m", "p", "p", "b", "b", "f", "f", "g", "g", "w", "w", "w", "y", "y",
+              // Less common but still important
+              "v", "k", "j", "x", "q", "z"
+            ];
+            
+            // Common Arabic/Persian letters
+            const commonArabicLetters = [
+              "ا", "ا", "ا", "ب", "ب", "ت", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ر", "ز", "س", "س", "ش", "ص", "ض", "ط", "ظ",
+              "ع", "ع", "غ", "ف", "ق", "ک", "ک", "ل", "ل", "م", "م", "ن", "ن", "ه", "ه", "و", "و", "ی", "ی",
+              "پ", "چ", "ژ", "گ", "آ", "أ", "إ", "ة", "ى"
+            ];
+            
+            // Other script letters
+            const otherScriptLetters = [
+              "你", "好", "我", "是", "的", "人", "中", "国", "爱", "学",
+              "अ", "आ", "इ", "क", "ख", "ग", "म", "न", "र", "स",
+              "а", "б", "в", "г", "д", "е", "и", "к", "л", "м", "н", "о", "п", "р", "с", "т"
+            ];
+            
+            // Build the multilingual pool - heavily favor English
+            multilingualCharacterPool.push(...commonEnglishLetters);
+            multilingualCharacterPool.push(...commonEnglishLetters); // Add English twice for higher probability
+            multilingualCharacterPool.push(...commonArabicLetters.slice(0, 5)); // Reduced Arabic
+            multilingualCharacterPool.push(...otherScriptLetters.slice(0, 3)); // Reduced other scripts
+            
+            // Select character from the multilingual pool
+            this.dna.type = random(multilingualCharacterPool);
+            this.textType = this.dna.type;
+            this.scriptCategory = this.getScriptCategory(this.textType);
           }
+          
+          // Recreate visual with new character
+          if (this.mesh) {
+            this.removeMesh();
+          }
+          this.createVisualRepresentation();
           break;
         case "opacity":
           this.dna.opacity = constrain(
@@ -2554,11 +2975,16 @@ function draw() {
   }
   drawFocusResonanceVisual(); // Draw the visual if active
   
-  // Display any confirmed words (with error handling)
-  try {
-    displayConfirmedWords();
-  } catch (error) {
-    console.warn("Error displaying confirmed words:", error);
+  // Display any confirmed words (with error handling) - only in letter mode
+  if (!isVerseMode) {
+    try {
+      displayConfirmedWords();
+    } catch (error) {
+      console.warn("Error displaying confirmed words:", error);
+    }
+  } else {
+    // In verse mode, display verse words and their interaction hints
+    displayVerseWords();
   }
 
   // Camera position for both p5.js and Three.js
@@ -2593,14 +3019,16 @@ function draw() {
     }
   }
 
-  // Update and display the ecosystem
-  ecosystem.display();
+  // Update and display the ecosystem - only in letter mode
+  if (!isVerseMode) {
+    ecosystem.display();
 
-  // Update the organisms
-  updateOrganisms();
+    // Update the organisms
+    updateOrganisms();
 
-  // Draw connections between organisms
-  drawConnections();
+    // Draw connections between organisms
+    drawConnections();
+  }
 
   // Draw 3D environment elements
   drawEnvironment();
@@ -2634,8 +3062,10 @@ function draw() {
       drawFocusResonanceVisual(); // Draw the visual if active
   }
 
-  // After all existing objects are drawn, add our letter flow visualization
-  drawLetterFlow();
+  // After all existing objects are drawn, add our letter flow visualization - only in letter mode
+  if (!isVerseMode) {
+    drawLetterFlow();
+  }
 }
 
 // Draw 3D environment elements
@@ -3035,13 +3465,74 @@ function mouseReleased() {
 
 // Add mouse wheel for zoom
 function mouseWheel(event) {
-  // Only zoom if we're not over UI elements
+  // Check if mouse is over scrollable content areas first
+  if (isMouseOverScrollableArea()) {
+    // Allow default scrolling behavior for UI content
+    console.log("📜 Scrolling in UI area, allowing native scroll");
+    return true; // Allow default scrolling
+  }
+  
+  // Only zoom if we're not over any UI elements
   if (!isMouseOverUI()) {
     // Zoom in or out based on wheel direction
     window.zoomCamera(event.delta * 0.5);
     
     // Prevent default behavior to avoid page scrolling while zooming
     return false;
+  }
+  
+  // Mouse is over UI but not in scrollable area - prevent camera zoom
+  return false;
+}
+
+// Add keyboard shortcuts for testing English word detection
+function keyPressed() {
+  if (key === 't' || key === 'T') {
+    // Create test English word
+    createTestEnglishWord();
+    console.log("🧪 Test English word created! Press 'T' key to create a test word.");
+  } else if (key === 'c' || key === 'C') {
+    // Clear space and create new organisms
+    clearSpace();
+    initializeOrganisms();
+    console.log("🔄 Space cleared and reinitialized! Press 'C' key to reset.");
+  } else if (key === 'd' || key === 'D') {
+    // Debug: print current organism info
+    console.log("=== CURRENT ORGANISM DEBUG INFO ===");
+    const englishOrgs = organisms.filter(org => org.scriptCategory === 'default');
+    console.log(`English organisms: ${englishOrgs.length}`);
+    if (englishOrgs.length > 0) {
+      console.log("English organism sample:", englishOrgs.slice(0, 10).map(org => ({
+        char: org.textType,
+        script: org.scriptCategory,
+        id: org.id,
+        pos: `(${Math.round(org.pos.x)}, ${Math.round(org.pos.y)})`
+      })));
+    }
+    
+    const allScripts = {};
+    organisms.forEach(org => {
+      const script = org.scriptCategory || 'unknown';
+      allScripts[script] = (allScripts[script] || 0) + 1;
+    });
+    console.log("All script distribution:", allScripts);
+  } else if (key === 'e' || key === 'E') {
+    // Force English letter creation
+    for (let i = 0; i < 10; i++) {
+      const englishLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+      const randomLetter = englishLetters[Math.floor(Math.random() * englishLetters.length)];
+      
+      let organism = createOrganism(
+        random(-width/2, width/2), 
+        random(-height/2, height/2)
+      );
+      organism.textType = randomLetter;
+      organism.dna.type = randomLetter;
+      organism.scriptCategory = "default";
+      
+      console.log(`Created English organism: "${randomLetter}" with script: ${organism.scriptCategory}`);
+    }
+    console.log("🔤 Added 10 English letters! Press 'E' key to add more English letters.");
   }
 }
 
@@ -3427,6 +3918,17 @@ window.resetCamera = function () {
   console.log("Space cleared and camera reset to default position");
 };
 
+// Add a function to restart with English priority
+window.restartWithEnglish = function () {
+  // Clear everything first
+  clearSpace();
+  
+  // Initialize with new English-heavy distribution
+  initializeOrganisms();
+  
+  console.log("Restarted with English-prioritized organisms");
+};
+
 // Function to clear the space and remove all organisms and words
 function clearSpace() {
   // Clear confirmed words
@@ -3450,6 +3952,60 @@ function clearSpace() {
   console.log("Space completely cleared - all letters removed");
 }
 
+// Enhanced clearing function specifically for verse mode entry
+function clearSpaceForVerseMode() {
+  console.log("🧹 Thoroughly clearing space for verse mode...");
+  
+  // Clear confirmed words that are part of letter mode
+  confirmedWords = [];
+  
+  // Remove ALL organisms and their meshes
+  while (organisms.length > 0) {
+    const org = organisms.pop();
+    if (org.mesh) {
+      org.removeMesh();
+    }
+  }
+  
+  // Clear the ecosystem completely
+  ecosystem = new Ecosystem();
+  
+  // Clear letter flow visualization data
+  letterOrgData = [];
+  
+  // Clear any Three.js objects that might be letter-related (be selective to preserve verse words)
+  const objectsToRemove = [];
+  threeScene.traverse((child) => {
+    // Only remove objects that are NOT verse words
+    if (child.isMesh && child.userData && child.userData.isLetterOrganism) {
+      objectsToRemove.push(child);
+    }
+  });
+  
+  objectsToRemove.forEach(obj => {
+    threeScene.remove(obj);
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) {
+      if (Array.isArray(obj.material)) {
+        obj.material.forEach(mat => mat.dispose());
+      } else {
+        obj.material.dispose();
+      }
+    }
+  });
+  
+  // Clear any remaining visual effects or temporary objects
+  // Reset focus/resonance state if active
+  if (focusResonanceActive) {
+    focusResonanceActive = false;
+  }
+  
+  // Update UI to reflect the cleared state
+  updateWordList();
+  
+  console.log("✨ Space completely cleared for verse mode - only collected words remain available");
+}
+
 window.zoomCamera = function (amount) {
   cameraZoom = constrain(cameraZoom + amount, CONFIG.minCameraZoom, CONFIG.maxCameraZoom);
   // Update the window object for testing
@@ -3461,92 +4017,214 @@ function initializeOrganisms() {
   // Use a larger initial set as specified in CONFIG
   let initialCount = CONFIG.initialOrganisms;
 
-  // Create specific sets of vowels and common consonants to ensure word formation
-  // These are the most important letters for forming common English words
-  const vowels = ['a', 'e', 'i', 'o', 'u'];
-  const commonConsonants = ['t', 'n', 's', 'r', 'h', 'l', 'd', 'c', 'm', 'p', 'b', 'f', 'g', 'w'];
+  // Extract different script categories from CONFIG.types
+  const arabicChars = CONFIG.types.filter(char => {
+    const script = getScriptCategoryForChar(char);
+    return script === 'arabic';
+  });
   
-  // Set up positions in a more structured arrangement for the core letters
-  const coreLetters = [...vowels, ...commonConsonants];
-  const corePositions = [];
+  const englishChars = CONFIG.types.filter(char => {
+    return /[a-zA-Z]/.test(char); // Just check if it's a Latin letter
+  });
   
-  // Calculate positions in a circular pattern for better initial clustering
-  const radius = min(width, height) / 4;
-  const centerX = 0;
-  const centerY = 0;
-  const angleStep = TWO_PI / coreLetters.length;
+  const otherScriptChars = CONFIG.types.filter(char => {
+    const script = getScriptCategoryForChar(char);
+    return script !== 'arabic' && script !== 'default';
+  });
+
+  // Create a diverse mix of characters from different scripts
+  // Prioritize English for better word formation: 70% English, 15% Arabic, 15% other scripts
+  const coreCharacters = [];
   
-  for (let i = 0; i < coreLetters.length; i++) {
-    const angle = i * angleStep;
-    const x = centerX + cos(angle) * radius * 0.6; // Tighter core circle
-    const y = centerY + sin(angle) * radius * 0.6;
-    const z = random(CONFIG.depthRange.min / 2, CONFIG.depthRange.max / 2); // More central z position
-    corePositions.push({x, y, z});
-  }
-  
-  // Shuffle positions for more natural arrangement
-  for (let i = corePositions.length - 1; i > 0; i--) {
-    const j = floor(random(i + 1));
-    [corePositions[i], corePositions[j]] = [corePositions[j], corePositions[i]];
-  }
-  
-  // Create core letter organisms (crucial for word formation)
-  for (let i = 0; i < coreLetters.length; i++) {
-    const pos = corePositions[i];
-    const organism = createOrganism(pos.x, pos.y);
-    organism.pos.z = pos.z;
-    
-    // Assign the letter
-    organism.textType = coreLetters[i];
-    organism.dna.type = coreLetters[i];
-    organism.scriptCategory = 'default';
-    
-    // Log core letter initialization
-    console.log(`Initialized core letter: ${coreLetters[i]} at position (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`);
-  }
-  
-  // Use a mix of vowels and common consonants for better word formation
-  // Creating duplicate common letters increases chances of word formation
-  const letterPool = [
-    // Extra vowels (crucial for most words)
-    'a', 'a', 'e', 'e', 'e', 'i', 'i', 'o', 'o', 'u',
-    
-    // Common consonants 
-    't', 't', 'n', 'n', 's', 's', 'r', 'r', 'h', 'l', 'd', 'c', 'm', 'p', 'w',
-    
-    // Less common but useful letters
-    'f', 'g', 'b', 'v', 'k', 'j', 'x', 'q', 'z', 'y'
+  // Define common English letters directly (not relying on CONFIG.types filtering)
+  const commonEnglishLetters = [
+    // Vowels - very high frequency for word formation
+    'a', 'a', 'a', 'a', 'a', 'e', 'e', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'o', 'o', 'o', 'u', 'u',
+    // Most common consonants for word formation
+    't', 't', 't', 't', 'n', 'n', 'n', 's', 's', 's', 'r', 'r', 'r', 'h', 'h', 'l', 'l', 'd', 'd',
+    // Common word starters and connectors  
+    'c', 'c', 'm', 'm', 'p', 'p', 'b', 'b', 'f', 'f', 'g', 'g', 'w', 'w', 'y', 'y',
+    // Less frequent but important for variety
+    'v', 'k', 'j', 'x', 'q', 'z'
   ];
   
-  // Create remaining organisms with good letter distribution
-  const remainingCount = initialCount - coreLetters.length;
-  for (let i = 0; i < remainingCount; i++) {
-    // More varied positioning for remaining organisms - further expanded for spaciousness
-    let x = random(-width / 2, width / 2) * 2.0; // Further expanded initial spread from 1.4 to 2.0
+  // Add common Arabic/Persian letters (reduced proportion)
+  const commonArabicLetters = ['ا', 'ب', 'ت', 'ن', 'س', 'ر', 'ل', 'م', 'ع', 'د', 'ه', 'و', 'ی'];
+  const availableArabic = arabicChars.filter(char => commonArabicLetters.includes(char));
+  if (availableArabic.length === 0) {
+    // Fallback to any Arabic characters available
+    availableArabic.push(...arabicChars.slice(0, 10));
+  }
+  
+  // Mix characters with English priority
+  const englishCount = Math.floor(initialCount * 0.70); // 70% English
+  const arabicCount = Math.floor(initialCount * 0.15);  // 15% Arabic
+  const otherCount = initialCount - englishCount - arabicCount; // 15% other scripts
+  
+  // Add characters to core pool - English first for priority
+  console.log(`Adding ${englishCount} English letters, ${arabicCount} Arabic letters, ${otherCount} other letters`);
+  
+  // Add English letters first - ensure we always have English letters
+  for (let i = 0; i < englishCount; i++) {
+    coreCharacters.push(commonEnglishLetters[i % commonEnglishLetters.length]);
+  }
+  
+  console.log(`Added ${englishCount} English letters to core characters`);
+  console.log(`English letters sample:`, coreCharacters.slice(0, 10));
+  
+  // Add Arabic letters
+  for (let i = 0; i < arabicCount && availableArabic.length > 0; i++) {
+    coreCharacters.push(availableArabic[i % availableArabic.length]);
+  }
+  
+  // Add other script letters
+  for (let i = 0; i < otherCount && otherScriptChars.length > 0; i++) {
+    coreCharacters.push(otherScriptChars[i % otherScriptChars.length]);
+  }
+  
+  // Fill remaining slots with random characters from CONFIG.types
+  while (coreCharacters.length < initialCount) {
+    const randomChar = random(CONFIG.types);
+    if (typeof randomChar === 'string') {
+      coreCharacters.push(randomChar);
+    }
+  }
+  
+  // Shuffle the characters
+  for (let i = coreCharacters.length - 1; i > 0; i--) {
+    const j = floor(random(i + 1));
+    [coreCharacters[i], coreCharacters[j]] = [coreCharacters[j], coreCharacters[i]];
+  }
+  
+  // Create organisms with diverse positioning
+  for (let i = 0; i < coreCharacters.length; i++) {
+    // More varied positioning for better distribution
+    let x = random(-width / 2, width / 2) * 2.0;
     let y = random(-height / 2, height / 2) * 2.0;
     let z = random(CONFIG.depthRange.min, CONFIG.depthRange.max);
 
     let organism = createOrganism(x, y);
     organism.pos.z = z;
 
-    // Assign letters from our pool for better word formation
-    // 95% chance to use our optimized letter distribution
-    if (random() < 0.95) {
-      const letter = random(letterPool);
-      organism.textType = letter;
-      organism.dna.type = letter;
-      organism.scriptCategory = 'default';
-      
-      console.log(`Initialized organism with letter: ${letter}`);
-    } else {
-      // Small chance for diversity
-      if (random() < 0.5) {
-        organism.mutate();
+    // Assign the character
+    const char = coreCharacters[i];
+    organism.textType = char;
+    organism.dna.type = char;
+    organism.scriptCategory = getScriptCategoryForChar(char);
+    
+    console.log(`Initialized organism with character: "${char}" (script: ${organism.scriptCategory}, textType: ${organism.textType})`);
+  }
+
+  console.log(`Created ${organisms.length} initial organisms with English-prioritized distribution`);
+  console.log(`English: ${englishCount}, Arabic: ${arabicCount}, Other: ${otherCount}`);
+  
+  // Debug: Count actual script categories created
+  const actualScriptCounts = {};
+  organisms.forEach(org => {
+    const script = org.scriptCategory || 'unknown';
+    actualScriptCounts[script] = (actualScriptCounts[script] || 0) + 1;
+  });
+  console.log('Actual script distribution:', actualScriptCounts);
+  
+  // Show debugging instructions
+  console.log(`
+🔍 ENGLISH WORD DETECTION DEBUGGING ENABLED:
+   Press 'T' to create a test English word cluster
+   Press 'E' to add 10 random English letters
+   Press 'D' to print current organism debug info  
+   Press 'C' to clear and reinitialize space
+   
+✅ English letters are now explicitly mapped to 'default' script category
+✅ Enhanced debugging for English word cluster detection
+✅ Improved clustering distances for English words
+  `);
+  
+  // Create a test English word cluster to verify the system works
+  setTimeout(() => {
+    createTestEnglishWord();
+  }, 2000); // Wait 2 seconds then create a test word
+}
+
+// Test function to create a simple English word for verification
+function createTestEnglishWord() {
+  console.log("🧪 Creating test English word 'HELLO' to verify system...");
+  
+  const testWord = "HELLO";
+  const testPositions = [
+    { x: -100, y: 0 },
+    { x: -50, y: 0 },
+    { x: 0, y: 0 },
+    { x: 50, y: 0 },
+    { x: 100, y: 0 }
+  ];
+  
+  // Remove any existing organisms close to these positions
+  for (let i = organisms.length - 1; i >= 0; i--) {
+    const org = organisms[i];
+    for (const pos of testPositions) {
+      const d = dist(org.pos.x, org.pos.y, pos.x, pos.y);
+      if (d < 150) {
+        org.removeMesh();
+        organisms.splice(i, 1);
+        break;
       }
     }
   }
+  
+  // Create the test word organisms
+  for (let i = 0; i < testWord.length; i++) {
+    const char = testWord[i];
+    const pos = testPositions[i];
+    
+    let organism = createOrganism(pos.x, pos.y);
+    organism.pos.z = 0; // Place in front
+    organism.textType = char;
+    organism.dna.type = char;
+    organism.scriptCategory = "default"; // Explicitly set as English
+    
+    // Make them stationary to form a cluster
+    organism.vel.mult(0);
+    organism.acc.mult(0);
+    
+    console.log(`Created test organism: "${char}" at (${pos.x}, ${pos.y}) with script: ${organism.scriptCategory}`);
+  }
+  
+  console.log(`✅ Test word "${testWord}" created! It should be detected as an English word cluster.`);
+}
 
-  console.log(`Created ${organisms.length} initial organisms with optimized letter distribution for word formation`);
+// Helper function to get script category for a character (used in initialization)
+function getScriptCategoryForChar(character) {
+  // First check if the character is in our script map
+  if (CONFIG.scriptMap[character]) {
+    return CONFIG.scriptMap[character];
+  }
+  
+  // If not found in map, try to detect by Unicode ranges
+  const code = character.charCodeAt(0);
+  
+  // Greek: U+0370 to U+03FF
+  if (code >= 0x0370 && code <= 0x03FF) return "greek";
+  
+  // Cyrillic: U+0400 to U+04FF
+  if (code >= 0x0400 && code <= 0x04FF) return "cyrillic";
+  
+  // Hebrew: U+0590 to U+05FF
+  if (code >= 0x0590 && code <= 0x05FF) return "hebrew";
+  
+  // Arabic: U+0600 to U+06FF
+  if (code >= 0x0600 && code <= 0x06FF) return "arabic";
+  
+  // Devanagari: U+0900 to U+097F
+  if (code >= 0x0900 && code <= 0x097F) return "indic";
+  
+  // Thai: U+0E00 to U+0E7F
+  if (code >= 0x0E00 && code <= 0x0E7F) return "southeastAsian";
+  
+  // CJK Unified Ideographs: U+4E00 to U+9FFF
+  if (code >= 0x4E00 && code <= 0x9FFF) return "eastAsian";
+  
+  // Default to Latin-based
+  return "default";
 }
 
 // Create a new organism
@@ -3692,32 +4370,93 @@ function detectWordClusters() {
     /^[a-zA-Z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0A80-\u0AFF\u0B00-\u0B7F\u0B80-\u0BFF\u0C00-\u0C7F\u0C80-\u0CFF\u0D00-\u0D7F\u0D80-\u0DFF\u0E00-\u0E7F\u0E80-\u0EFF\u0F00-\u0FFF\u1000-\u109F\u10A0-\u10FF\u1100-\u11FF\u1E00-\u1EFF\u1F00-\u1FFF\u2C80-\u2CFF\u2D00-\u2D2F\u2D30-\u2D7F\u2D80-\u2DDF\u2E80-\u2EFF\u2F00-\u2FDF\u2FF0-\u2FFF\u3040-\u309F\u30A0-\u30FF\u3100-\u312F\u3130-\u318F\u3190-\u319F\u31A0-\u31BF\u31F0-\u31FF\u3200-\u32FF\u3300-\u33FF\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uA700-\uA71F\uA720-\uA7FF\uA800-\uA82F\uA840-\uA87F\uA880-\uA8DF\uA900-\uA92F\uA930-\uA95F\uA960-\uA97F\uA980-\uA9DF\uAA00-\uAA5F\uAA60-\uAA7F\uAA80-\uAADF\uAB00-\uAB2F\uAB30-\uAB6F\uAB70-\uABBF\uABC0-\uABFF\uAC00-\uD7AF\uD7B0-\uD7FF\uF900-\uFAFF\uFB00-\uFB4F\uFB50-\uFDFF\uFE00-\uFE0F\uFE20-\uFE2F\uFE30-\uFE4F\uFE50-\uFE6F\uFE70-\uFEFF\uFF00-\uFFEF]$/u.test(org.textType)
   );
   
-  console.log("ALL ACTIVE ORGANISMS:", activeOrganisms.map(org => org.textType).join(''));
+  // Debug: Log ALL organisms to see what's actually being generated
+  if (frameCount % 180 === 0) {  // Every 3 seconds
+    console.log("=== DEBUGGING ALL ORGANISMS ===");
+    console.log(`Total organisms: ${organisms.length}`);
+    console.log(`Confirmed word organism IDs: ${Array.from(confirmedOrganismIds)}`);
+    console.log(`Active organisms after filtering: ${activeOrganisms.length}`);
+    
+    // Sample of all organisms regardless of filtering
+    const allOrganismsSample = organisms.slice(0, 10).map(org => ({
+      char: org.textType,
+      script: org.scriptCategory,
+      id: org.id,
+      confirmed: confirmedOrganismIds.has(org.id),
+      regex_pass: org.textType && /^[a-zA-Z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u05FF\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0A80-\u0AFF\u0B00-\u0B7F\u0B80-\u0BFF\u0C00-\u0C7F\u0C80-\u0CFF\u0D00-\u0D7F\u0D80-\u0DFF\u0E00-\u0E7F\u0E80-\u0EFF\u0F00-\u0FFF\u1000-\u109F\u10A0-\u10FF\u1100-\u11FF\u1E00-\u1EFF\u1F00-\u1FFF\u2C80-\u2CFF\u2D00-\u2D2F\u2D30-\u2D7F\u2D80-\u2DDF\u2E80-\u2EFF\u2F00-\u2FDF\u2FF0-\u2FFF\u3040-\u309F\u30A0-\u30FF\u3100-\u312F\u3130-\u318F\u3190-\u319F\u31A0-\u31BF\u31F0-\u31FF\u3200-\u32FF\u3300-\u33FF\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uA700-\uA71F\uA720-\uA7FF\uA800-\uA82F\uA840-\uA87F\uA880-\uA8DF\uA900-\uA92F\uA930-\uA95F\uA960-\uA97F\uA980-\uA9DF\uAA00-\uAA5F\uAA60-\uAA7F\uAA80-\uAADF\uAB00-\uAB2F\uAB30-\uAB6F\uAB70-\uABBF\uABC0-\uABFF\uAC00-\uD7AF\uD7B0-\uD7FF\uF900-\uFAFF\uFB00-\uFB4F\uFB50-\uFDFF\uFE00-\uFE0F\uFE20-\uFE2F\uFE30-\uFE4F\uFE50-\uFE6F\uFE70-\uFEFF\uFF00-\uFFEF]$/u.test(org.textType)
+    }));
+    console.log("Sample of all organisms:", allOrganismsSample);
+    
+    // Count English letters specifically
+    const englishLetters = organisms.filter(org => 
+      org.textType && /^[a-zA-Z]$/.test(org.textType)
+    );
+    console.log(`English letters found: ${englishLetters.length}`);
+    if (englishLetters.length > 0) {
+      console.log("English letter sample:", englishLetters.slice(0, 5).map(org => ({
+        char: org.textType,
+        script: org.scriptCategory,
+        id: org.id
+      })));
+    }
+  }
+  
+  // Group active organisms by script category for better debugging
+  const organismsByScriptDebug = activeOrganisms.reduce((acc, org) => {
+    const script = org.scriptCategory || "default";
+    if (!acc[script]) {
+      acc[script] = [];
+    }
+    acc[script].push(org.textType);
+    return acc;
+  }, {});
+
+  // Log organisms grouped by script instead of all mixed together
+  console.log("ACTIVE ORGANISMS BY SCRIPT:");
+  for (const [script, letters] of Object.entries(organismsByScriptDebug)) {
+    const scriptName = script === 'default' ? 'Latin/English' : 
+                      script === 'arabic' ? 'Arabic' :
+                      script === 'eastAsian' ? 'East Asian' :
+                      script === 'indic' ? 'Indic' :
+                      script === 'cyrillic' ? 'Cyrillic' : script;
+    console.log(`  ${scriptName}: "${letters.join('')}" (${letters.length} letters)`);
+    
+    // Special highlighting for English letters to make them more visible
+    if (script === 'default') {
+      const englishOnlyLetters = letters.filter(letter => /^[a-zA-Z]$/.test(letter));
+      if (englishOnlyLetters.length > 0) {
+        console.log(`    ✓ ENGLISH LETTERS DETECTED: "${englishOnlyLetters.join('')}" (${englishOnlyLetters.length} letters)`);
+      }
+    }
+  }
   
   // Extra debugging
   if (frameCount % 180 === 0) {  // Log every 3 seconds
     console.log(`Active text organisms: ${activeOrganisms.length}`);
-    // Display a sample of the active organisms' letters and scripts
-    if (activeOrganisms.length > 0) {
-      const sampleText = activeOrganisms.slice(0, 20).map(org => org.textType).join('');
-      console.log(`Sample letters available: ${sampleText}`);
-      
-      // Count letters by script category for debugging
-      const scriptCounts = activeOrganisms.reduce((acc, org) => {
-        const script = org.scriptCategory || 'default';
-        acc[script] = (acc[script] || 0) + 1;
-        return acc;
-      }, {});
-      
-      console.log('Letters by script category:', scriptCounts);
-      
-      // Log English letters specifically
-      if (scriptCounts['default']) {
-        const englishLetters = activeOrganisms
-          .filter(org => org.scriptCategory === 'default')
+    
+    // Count letters by script category for debugging
+    const scriptCounts = activeOrganisms.reduce((acc, org) => {
+      const script = org.scriptCategory || 'default';
+      acc[script] = (acc[script] || 0) + 1;
+      return acc;
+    }, {});
+    
+    console.log('Letters by script category:', scriptCounts);
+    
+    // Log a sample for each script category
+    for (const [script, count] of Object.entries(scriptCounts)) {
+      if (count > 0) {
+        const scriptLetters = activeOrganisms
+          .filter(org => (org.scriptCategory || 'default') === script)
           .map(org => org.textType)
+          .slice(0, 10) // Show first 10 letters as sample
           .join('');
-        console.log(`English letters available: ${englishLetters}`);
+        const scriptName = script === 'default' ? 'Latin/English' : 
+                          script === 'arabic' ? 'Arabic' :
+                          script === 'eastAsian' ? 'East Asian' :
+                          script === 'indic' ? 'Indic' :
+                          script === 'cyrillic' ? 'Cyrillic' : script;
+        console.log(`${scriptName} sample letters: "${scriptLetters}"`);
       }
     }
   }
@@ -3739,6 +4478,13 @@ function detectWordClusters() {
       continue; // Not enough organisms in this script group
     }
 
+    // Special logging for English (default) script processing
+    if (scriptCategory === 'default') {
+      console.log(`🔍 PROCESSING ENGLISH WORD CLUSTERS: ${scriptOrganisms.length} English letters available`);
+      const englishLettersPreview = scriptOrganisms.map(org => org.textType).filter(letter => /^[a-zA-Z]$/.test(letter)).slice(0, 10).join('');
+      console.log(`   English letters for clustering: "${englishLettersPreview}..."`);
+    }
+
     // Step 1: Build proximity map for the current script group
     const proximityMap = new Map();
     for (let i = 0; i < scriptOrganisms.length; i++) {
@@ -3749,15 +4495,11 @@ function detectWordClusters() {
         // Distance check (already same script category)
         const d = dist(org1.pos.x, org1.pos.y, org1.pos.z, org2.pos.x, org2.pos.y, org2.pos.z);
         
-        // Enhanced word formation - significantly boost formation likelihood
-        // Always connect nearby organisms of the same script for better word formation
-        const formationFactor = 100.0; // Extremely high value to force clusters to form
-        
-        // Use random chance to add even more connections
-        const randomConnect = random() < 0.4; // 40% chance to connect regardless of distance
-        
-        // Drastically increased distance check to force cluster formation
-        if (d < CONFIG.connectionDistance * formationFactor || randomConnect) { // Apply radius factor or random connection
+        // Enhanced word formation - increased formation distances to ensure clusters form
+        // Connect organisms that are reasonably close to each other with increased distance
+        // Special consideration for English letters (default script) - use more lenient distance
+        const maxDistance = scriptCategory === 'default' ? CONFIG.connectionDistance * 4 : CONFIG.connectionDistance * 3;
+        if (d < maxDistance) {
           if (!proximityMap.has(org1.id)) proximityMap.set(org1.id, []);
           if (!proximityMap.has(org2.id)) proximityMap.set(org2.id, []);
           proximityMap.get(org1.id).push(org2);
@@ -3801,6 +4543,14 @@ function detectWordClusters() {
     }
 
     // Step 3: Process clusters for this script group
+    if (scriptCategory === 'default' && clustersInScript.length > 0) {
+      console.log(`📝 ENGLISH CLUSTERS FOUND: ${clustersInScript.length} clusters detected for processing`);
+      clustersInScript.forEach((cluster, index) => {
+        const previewText = cluster.map(org => org.textType).join('');
+        console.log(`   Cluster ${index + 1}: "${previewText}" (${cluster.length} letters)`);
+      });
+    }
+    
     for (let cluster of clustersInScript) {
       // Sort organisms for consistent ID and string generation.
       // For LTR scripts (default, cyrillic, indic, eastAsian): sort by X-position.
@@ -3948,12 +4698,12 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
   }
   lastDictionaryCheckTime[scriptCategory] = currentTime;
 
-  if (!wordString || wordString.length < CONFIG.wordSettings.minClusterSize) {
+  if (!wordString || wordString.length < 1) {
     return;
   }
 
-  // UPDATED: Limit word length to a reasonable size
-  const maxLength = 5; // Changed from CONFIG.wordSettings.maxClusterSize
+  // UPDATED: Limit word length to a reasonable size - now more permissive
+  const maxLength = 8; // Increased to allow longer common words like "beautiful", "wonderful"
   if (wordString.length > maxLength) {
     // If too long, we'll try to find words within this string
     console.log(`Word "${wordString}" is too long (${wordString.length} chars), checking for words within it`);
@@ -3966,51 +4716,108 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
   
   const wordLower = wordString.toLowerCase();
   
-  // Check against our dictionary of common words - ENHANCED DICTIONARY
+  // Check against our comprehensive dictionary of common words - GREATLY EXPANDED
   const commonWords = [
-      // Common short words
-      "the", "and", "for", "not", "with", "but", "his", "from", "they", "say", "she", "will", 
-      "one", "all", "you", "was", "were", "that", "this", "what", "when", "who", "how", "which",
-      "now", "get", "got", "see", "saw", "look", "put", "take", "took", "made", "make", "come", 
-      "came", "give", "gave", "find", "time", "day", "year", "way", "home", "life", "work",
-      "air", "boy", "car", "dog", "eye", "far", "hat", "ice", "joy", "key", "leg", "man", "new",
-      "old", "pen", "red", "sun", "two", "use", "war", "yes", "art", "cat", "eat", "fat", "god",
-      "hit", "job", "law", "mix", "pay", "run", "sit", "top", "win", "add", "age", "bad", "box",
-      "cry", "cut", "did", "dry", "end", "few", "fix", "fly", "fun", "gas", "guy", "hot", "let",
-      "lie", "low", "map", "may", "odd", "oil", "own", "per", "pop", "raw", "sea", "set", "sky",
-      "tax", "ten", "try", "use", "via", "war", "wax", "yet", "zoo",
+      // Single letters that might be meaningful
+      "a", "i",
       
-      // Additional common words
-      "about", "above", "across", "act", "after", "again", "against", "ago", "air", "all", 
-      "along", "also", "always", "among", "an", "and", "animal", "answer", "any", "are", 
-      "around", "as", "ask", "at", "back", "bad", "be", "because", "bed", "been", "before", 
-      "began", "begin", "behind", "being", "best", "better", "between", "big", "bird", "black", 
-      "blue", "boat", "body", "book", "both", "box", "boy", "bring", "brought", "build", "busy", 
-      "but", "by", "call", "came", "can", "car", "carry", "change", "children", "city", "close", 
-      "come", "could", "country", "cut", "day", "did", "different", "do", "does", "done", "door", 
-      "down", "draw", "dream", "drive", "drop", "dry", "during", "each", "early", "earth", "eat", 
-      "egg", "enough", "even", "ever", "every", "example", "eye", "face", "fact", "fall", "family", 
-      "far", "farm", "fast", "father", "feel", "feet", "few", "field", "find", "fire", "first", 
-      "fish", "five", "food", "foot", "form", "found", "four", "free", "friend", "from", "front", 
-      "full", "game", "gave", "get", "girl", "give", "go", "going", "gone", "good", "got", "great", 
-      "green", "ground", "group", "grow", "had", "half", "hand", "hard", "has", "have", "he", "head", 
-      "hear", "heard", "heart", "help", "her", "here", "high", "hill", "him", "his", "hold", "home", 
-      "horse", "hot", "hour", "house", "how", "hundred", "idea", "if", "important", "in", "into", 
-      "is", "it", "its", "just", "keep", "kind", "king", "knew", "know", "land", "large", "last", 
-      "late", "laugh", "learn", "leave", "left", "less", "let", "letter", "life", "light", "like", 
-      "line", "list", "little", "live", "long", "look", "love", "low", "made", "make", "man", "many", 
-      "may", "me", "mean", "men", "might", "mile", "miss", "money", "more", "morning", "most", 
-      "mother", "mountain", "move", "much", "must", "my", "name", "near", "need", "never", "new", 
-      "next", "night", "no", "north", "not", "note", "nothing", "now", "number", "of", "off", 
-      "often", "oh", "old", "on", "once", "one", "only", "open", "or", "order", "other", "our", 
-      "out", "over", "own", "page", "paper", "part", "pass", "people", "perhaps", "person", 
-      "picture", "place", "plant", "play", "point", "put", "quick", "quite", "rain", "ran", "read", 
-      "real", "red", "rest", "right", "river", "road", "rock", "room", "round", "run", "said", 
-      "same", "saw", "say", "school", "sea", "second", "see", "seem", "seen", "self", "sentence", 
-      "set", "several", "shall", "she", "ship", "short", "should", "show", "side", "simple", "since", 
-      "sing", "sit", "six", "size", "sleep", "slow", "small", "snow", "so", "some", "something", 
-      "song", "soon", "sound", "south", "spell", "start", "state", "stay", "step", 
-      "still", "stop", "story", "street", "strong", "study", "such", "sun", "sure", "table", "take", 
+      // 2-letter words - Essential building blocks
+      "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in", "is", "it", "me", "my", 
+      "no", "of", "on", "or", "so", "to", "up", "us", "we", "hi", "ok", "ah", "oh", "ex", "ad",
+      
+      // 3-letter words - Very common short words
+      "the", "and", "for", "not", "but", "his", "her", "you", "all", "was", "one", "our", "out", 
+      "had", "has", "can", "who", "oil", "sit", "set", "run", "may", "way", "day", "say", "any", 
+      "new", "now", "two", "how", "its", "why", "let", "put", "end", "get", "old", "see", "him", 
+      "use", "man", "men", "boy", "too", "car", "far", "sea", "eye", "try", "big", "yes", "job", 
+      "cut", "law", "war", "win", "buy", "pay", "lay", "key", "way", "may", "say", "day", "play",
+      "cat", "dog", "pig", "cow", "bat", "rat", "hat", "mat", "sat", "fat", "eat", "tea", "sea",
+      "red", "bed", "fed", "led", "wed", "net", "bet", "get", "set", "wet", "pet", "let", "met",
+      "top", "hop", "pop", "cop", "mop", "hot", "got", "not", "pot", "lot", "rot", "dot", "cot",
+      "sun", "fun", "run", "gun", "bun", "nut", "but", "cut", "hut", "gut", "put", "shut", 
+      "fly", "sky", "try", "cry", "dry", "fry", "spy", "buy", "guy", "lay", "pay", "hay", "ray",
+      "art", "arm", "ask", "add", "act", "age", "air", "bag", "bad", "ban", "bar", "bat", "box",
+      "bus", "cap", "cup", "did", "dig", "ear", "egg", "fix", "fox", "gas", "ice", "joy", "kid",
+      "leg", "map", "mix", "mud", "pan", "pen", "raw", "row", "sad", "tag", "van", "wax", "zoo",
+
+      // 4-letter words - Building toward complexity
+      "that", "with", "have", "this", "will", "your", "from", "they", "know", "want", "been", 
+      "good", "much", "some", "time", "very", "when", "come", "here", "just", "like", "long", 
+      "make", "many", "over", "such", "take", "than", "them", "well", "were", "what", "call", 
+      "came", "each", "find", "first", "give", "hand", "high", "keep", "last", "left", "life", 
+      "live", "look", "made", "most", "move", "must", "name", "need", "next", "only", "open", 
+      "part", "play", "read", "real", "right", "said", "same", "seem", "show", "side", "tell", 
+      "turn", "used", "want", "ways", "week", "went", "word", "work", "year", "also", "back", 
+      "best", "both", "down", "even", "face", "feel", "form", "game", "girl", "help", "home", 
+      "hour", "into", "kind", "line", "mind", "near", "once", "page", "pass", "place", "room", 
+      "seen", "ship", "soon", "talk", "team", "told", "took", "turn", "walk", "week", "went",
+      "able", "book", "care", "case", "city", "cool", "dark", "data", "date", "dear", "does", 
+      "done", "door", "draw", "drop", "easy", "ever", "face", "fact", "fall", "fast", "feet", 
+      "file", "fill", "fine", "fire", "fish", "five", "food", "foot", "four", "free", "full", 
+      "glad", "gold", "gone", "gray", "grew", "grow", "hair", "half", "hard", "head", "hear", 
+      "heat", "held", "hide", "hill", "hold", "hope", "huge", "idea", "inch", "iron", "join", 
+      "jump", "kept", "kill", "knew", "laid", "land", "late", "lead", "lean", "left", "less", 
+      "list", "load", "loan", "lock", "lose", "loss", "lost", "love", "male", "mark", "mass", 
+      "meal", "mean", "meat", "meet", "mike", "milk", "mine", "miss", "mode", "moon", "more", 
+      "note", "paid", "pain", "pair", "park", "path", "pick", "plan", "poor", "push", "race", 
+      "rain", "rate", "rest", "rich", "rise", "risk", "road", "rock", "role", "roll", "roof", 
+      "root", "rule", "safe", "sale", "save", "seat", "self", "sell", "send", "ship", "shop", 
+      "shot", "sick", "sign", "size", "skin", "slip", "slow", "snow", "soft", "soil", "sold", 
+      "song", "sort", "spot", "star", "stay", "step", "stop", "sure", "tall", "tank", "task", 
+      "team", "term", "test", "text", "thin", "thus", "tile", "tiny", "tool", "tour", "town", 
+      "tree", "trip", "true", "tune", "unit", "upon", "vary", "vast", "view", "vote", "wage", 
+      "wait", "wake", "warm", "wash", "wave", "weak", "wear", "wide", "wife", "wild", "wind", 
+      "wine", "wing", "wise", "wish", "wood", "wool", "wore", "yard", "yeah", "zero", "zone",
+
+      // 5-letter words - Common longer words
+      "about", "above", "after", "again", "among", "anger", "angry", "apple", "asked", "basic", 
+      "beach", "began", "begin", "being", "below", "birth", "black", "blood", "board", "bring", 
+      "broad", "brown", "build", "built", "carry", "catch", "cause", "chair", "chart", "check", 
+      "child", "china", "chose", "civil", "class", "clean", "clear", "click", "clock", "close", 
+      "cloud", "color", "could", "count", "court", "cover", "craft", "crazy", "cream", "cross", 
+      "crowd", "cycle", "daily", "dance", "death", "depth", "doing", "doubt", "dozen", "drama", 
+      "drawn", "dream", "dress", "drink", "drive", "drove", "dying", "eager", "early", "earth", 
+      "eight", "empty", "enemy", "enjoy", "enter", "entry", "equal", "error", "event", "every", 
+      "exact", "exist", "extra", "faith", "false", "fault", "field", "fifth", "fifty", "fight", 
+      "final", "first", "fixed", "flash", "floor", "focus", "force", "forth", "forty", "found", 
+      "frame", "frank", "fresh", "front", "fruit", "fully", "funny", "glass", "grace", "grade", 
+      "grand", "grant", "grass", "great", "green", "gross", "group", "grown", "guard", "guess", 
+      "guide", "happy", "heart", "heavy", "horse", "hotel", "house", "human", "hurry", "image", 
+      "index", "inner", "input", "issue", "japan", "joint", "judge", "known", "label", "large", 
+      "laser", "later", "laugh", "layer", "learn", "least", "leave", "legal", "level", "light", 
+      "limit", "links", "lived", "local", "loose", "lower", "lucky", "lunch", "lying", "magic", 
+      "major", "maker", "march", "match", "maybe", "mayor", "meant", "media", "metal", "might", 
+      "minor", "minus", "mixed", "model", "money", "month", "moral", "motor", "mount", "mouse", 
+      "mouth", "moved", "movie", "music", "needs", "never", "newer", "night", "noise", "north", 
+      "noted", "novel", "nurse", "occur", "ocean", "offer", "often", "order", "other", "ought", 
+      "owner", "paint", "panel", "paper", "party", "peace", "phase", "phone", "photo", "piano", 
+      "piece", "pilot", "pitch", "place", "plain", "plane", "plant", "plate", "point", "pound", 
+      "power", "press", "price", "pride", "prime", "print", "prior", "prize", "proof", "proud", 
+      "prove", "queen", "quick", "quiet", "quite", "radio", "raise", "range", "rapid", "ratio", 
+      "reach", "ready", "realm", "rebel", "refer", "relax", "repay", "reply", "right", "rigid", 
+      "river", "robot", "roger", "roman", "rough", "round", "route", "royal", "rural", "scale", 
+      "scene", "scope", "score", "sense", "serve", "setup", "seven", "shade", "shake", "shall", 
+      "shame", "shape", "share", "sharp", "sheet", "shelf", "shell", "shift", "shine", "shirt", 
+      "shock", "shoot", "short", "shown", "sides", "sight", "silly", "since", "sixth", "sixty", 
+      "sized", "skill", "sleep", "slide", "small", "smart", "smile", "smith", "smoke", "snake", 
+      "solid", "solve", "sorry", "sound", "south", "space", "spare", "speak", "speed", "spend", 
+      "spent", "split", "spoke", "sport", "staff", "stage", "stake", "stand", "start", "state", 
+      "steam", "steel", "steep", "steer", "stick", "still", "stock", "stone", "stood", "store", 
+      "storm", "story", "strip", "stuck", "study", "stuff", "style", "sugar", "suite", "super", 
+      "sweet", "swift", "swing", "sword", "table", "taken", "taste", "taxes", "teach", "teeth", 
+      "texas", "thank", "theft", "their", "theme", "there", "these", "thick", "thing", "think", 
+      "third", "those", "three", "threw", "throw", "thumb", "tight", "timer", "title", "today", 
+      "topic", "total", "touch", "tough", "tower", "track", "trade", "train", "treat", "trend", 
+      "trial", "tribe", "trick", "tried", "tries", "truck", "truly", "trust", "truth", "twice", 
+      "twist", "uncle", "under", "undue", "union", "unity", "until", "upper", "upset", "urban", 
+      "usage", "usual", "valid", "value", "video", "virus", "visit", "vital", "vocal", "voice", 
+      "waste", "watch", "water", "wheel", "where", "which", "while", "white", "whole", "whose", 
+      "woman", "women", "world", "worry", "worse", "worst", "worth", "would", "write", "wrong", 
+      "wrote", "young", "youth",
+
+      // Common word patterns for better formation
+      "able", "like", "love", "hope", "word", "work", "play", "game", "life", "live", "time", 
+      "best", "each", "help", "need", "feel", "know", "take", "give", "keep", "tell", "mean", 
       "talk", "tell", "ten", "than", "that", "the", "their", "them", "then", "there", "these", 
       "they", "thing", "think", "this", "those", "though", "thought", "thousand", "three", "through", 
       "thus", "time", "to", "today", "together", "told", "too", "took", "top", "toward", "town", 
@@ -4024,13 +4831,39 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
   if (commonWords.includes(wordLower)) {
       const definition = `A common English word: ${wordString}`;
       confirmWord(clusterId, wordString, organisms, currentTime, definition, scriptCategory, "english");
-      console.log(`Accepted common English word: "${wordString}"`);
+      console.log(`✅ SUCCESS: Accepted common English word: "${wordString}"`);
+      return;
+  }
+  
+  // Check for common Arabic words
+  const commonArabicWords = ["ان", "من", "في", "الا", "هو", "هي", "ما", "لا", "نا", "با", "تا", "است", "به", "را"];
+  if (commonArabicWords.includes(wordString) && scriptCategory === 'arabic') {
+      const definition = `A common Arabic/Persian word: ${wordString}`;
+      confirmWord(clusterId, wordString, organisms, currentTime, definition, scriptCategory, "arabic");
+      console.log(`✅ SUCCESS: Accepted common Arabic word: "${wordString}"`);
+      return;
+  }
+  
+  // Check for common Chinese words
+  const commonChineseWords = ["你好", "谢谢", "不客", "客气", "再见", "是的", "好的", "我们", "他们", "什么", "怎么", "为什么"];
+  if (commonChineseWords.includes(wordString) && scriptCategory === 'eastAsian') {
+      const definition = `A common Chinese word: ${wordString}`;
+      confirmWord(clusterId, wordString, organisms, currentTime, definition, scriptCategory, "chinese");
+      console.log(`✅ SUCCESS: Accepted common Chinese word: "${wordString}"`);
+      return;
+  }
+  
+  // Additional check for 2-letter words that might be missing from the main dictionary
+  const common2LetterWords = ["am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in", "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we"];
+  if (wordString.length === 2 && common2LetterWords.includes(wordLower)) {
+      const definition = `A common 2-letter English word: ${wordString}`;
+      confirmWord(clusterId, wordString, organisms, currentTime, definition, scriptCategory, "english");
+      console.log(`✅ SUCCESS: Accepted 2-letter English word: "${wordString}"`);
       return;
   }
     
-    // Also check if it's in our predefined dictionary
-    const possibleWords = generatePossibleWords(wordLower);
-    if (possibleWords.includes(wordLower)) {
+    // Also check if it's in our predefined dictionary using the enhanced word generator
+    if (enhancedWordGenerator.isValidWord(wordLower)) {
       const definition = `A word discovered in the biome: ${wordLower}`;
       confirmWord(clusterId, wordString, organisms, currentTime, definition, scriptCategory, "english");
       console.log(`Dictionary validation SUCCESS for "${wordString}"`);
@@ -4143,7 +4976,7 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
         "smoke", "smooth", "snake", "snow", "so", "soap", "sock", "soft", "some", "son", "song",
         "soon", "sorry", "sound", "soup", "south", "space", "speak", "special", "speed", "spell",
         "spend", "spill", "spin", "spirit", "spit", "split", "sport", "spread", "spring", "square",
-        "staff", "stage", "stand", "star", "start", "state", "stay", "steal", "steam", "step",
+        "staff", "stage", "star", "start", "state", "stay", "steal", "steam", "step",
         "stick", "stiff", "still", "stone", "stop", "store", "storm", "story", "stove", "strange",
         "street", "stretch", "string", "strong", "student", "study", "stupid", "such", "sudden",
         "sugar", "suit", "summer", "sun", "supper", "sure", "sweet", "swim", "sword", "table",
@@ -4170,8 +5003,8 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
 
     // Generic fallback rules (apply if still not valid, for any language)
     if (!isValidWord) {
-        // Check against our more comprehensive word system 
-        if (possibleWords.length > 0) {
+        // Check against our more comprehensive word system using enhanced word generator
+        if (enhancedWordGenerator.isValidWord(wordStringLower)) {
             isValidWord = true;
             definition = definition || `A word detected in the biome.`;
             console.log(`Local dictionary validation FALLBACK for "${wordString}"`);
@@ -4251,29 +5084,16 @@ async function checkWordValidity(clusterId, wordString, organisms, currentTime, 
       // Debug: Check against common words list directly for English
       if (scriptCategory === 'default') {
         const debugCommonWords = [
-          "the", "and", "for", "not", "with", "you", "this", "but", "his", "from", "they",
-          "say", "she", "will", "one", "all", "would", "there", "their", "what", "out", "about",
-          "who", "get", "which", "when", "make", "can", "like", "time", "just", "him", "know",
-          "take", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than",
-          "then", "now", "look", "only", "come", "its", "over", "think", "also", "back", "after",
-          "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", "want",
-          "because", "any", "these", "give", "day", "most", "creative", "design", "poem", "word",
-          "life", "dream", "flow", "nature", "mind", "idea", "form", "light", "dark", "space",
-          "echo", "voice", "sound", "image", "color", "shape", "move", "pulse", "wave", "rhythm",
-          "energy", "being", "soul", "earth", "water", "fire", "air", "void", "chaos", "order",
-          "about", "above", "across", "act", "active", "add", "afraid", "after", "again", "age",
-          "ago", "agree", "air", "allow", "alone", "along", "already", "always", "am", "amount",
-          "an", "ancient", "anger", "angry", "animal", "answer", "any", "anyone", "anything",
-          "appear", "apple", "are", "area", "arm", "army", "around", "arrive", "art", "as", "ask",
-          "at", "away", "baby", "back", "bad", "bag", "ball", "bank", "base", "basket", "bath", "be",
-          "beautiful", "bed", "bee", "been", "before", "begin", "behind", "bell", "belong", "below",
-          "beside", "best", "better", "between", "big", "bird", "birth", "birthday", "bit", "bite",
-          "black", "blame", "blank", "blind", "block", "blood", "blow", "blue", "board", "boat",
-          "body", "book", "border", "born", "both", "bottle", "bottom", "bowl", "box", "boy",
-          "branch", "brave", "bread", "break", "breath", "bridge", "bright", "bring", "brother",
-          "brown", "brush", "build", "burn", "bus", "busy", "but", "buy", "by", "cake", "call",
-          "can", "candle", "cap", "car", "card", "care", "carry", "case", "cat", "catch", "cause",
-          "center", "certain", "chain", "chair", "chance", "change", "chase", "cheap", "cheese"
+          "the", "and", "for", "not", "with", "but", "his", "from", "they", "say", "she", "will", 
+          "one", "all", "you", "was", "were", "that", "this", "what", "when", "who", "how", "which",
+          "now", "get", "got", "see", "saw", "look", "put", "take", "took", "made", "make", "come", 
+          "came", "give", "gave", "find", "time", "day", "year", "way", "home", "life", "work",
+          "air", "boy", "car", "dog", "eye", "far", "hat", "ice", "joy", "key", "leg", "man", "new",
+          "old", "pen", "red", "sun", "two", "use", "war", "yes", "art", "cat", "eat", "fat", "god",
+          "hit", "job", "law", "mix", "pay", "run", "sit", "top", "win", "add", "age", "bad", "box",
+          "cry", "cut", "did", "dry", "end", "few", "fix", "fly", "fun", "gas", "guy", "hot", "let",
+          "lie", "low", "map", "may", "odd", "oil", "own", "per", "pop", "raw", "sea", "set", "sky",
+          "tax", "ten", "try", "use", "via", "war", "wax", "yet", "zoo", "bait"
         ];
         
         if (debugCommonWords.includes(wordStringLower)) {
@@ -4346,220 +5166,38 @@ function findWordsWithinString(clusterId, wordString, organisms, currentTime, sc
   return foundWords;
 }
 
-// NEW: Generate possible words from a set of letters
+// Enhanced generatePossibleWords function using the new system
 function generatePossibleWords(letters) {
   if (!letters || letters.length < 2) return [];
   
-  // First, let's use our predefined dictionary for common anagrams
-  const letterSort = letters.toLowerCase().split('').sort().join('');
-  let possibleWords = [];
+  // Use the enhanced word generator
+  const possibleWords = enhancedWordGenerator.generatePossibleWords(letters, 2, 5);
   
-  const predefinedAnagrams = {
-    // Common anagram sets with real, valid English words
-    'aelst': ['least', 'stale', 'steal', 'tales'],
-    'aepst': ['paste', 'pates', 'spate', 'tapes'],
-    'aerst': ['rates', 'stare', 'tears', 'tares'],
-    'airst': ['stair', 'tarsi', 'traits'],
-    'ginre': ['reign'],
-    'eginr': ['reign'],
-    'elost': ['stole', 'toles'],
-    'host': ['shot', 'host'],
-    'post': ['pots', 'spot', 'stop', 'tops', 'post'],
-    'rst': ['str'],
-    'ast': ['sat', 'ast', 'tas'],
-    'eht': ['the'],
-    'dna': ['and'],
-    'rof': ['for'],
-    'eltt': ['lett'],
-    'acrt': ['cart', 'trac'],
-    'adet': ['date', 'tead'],
-    'aehr': ['hear', 'hare'],
-    'aehrt': ['earth', 'heart'],
-    'aelp': ['leap', 'pale', 'peal', 'plea'],
-    'aemn': ['mean', 'name', 'mane'],
-    'aenr': ['earn', 'near'],
-    'aest': ['east', 'eats', 'seat', 'teas'],
-    'aeht': ['heat', 'hate'],
-    'ahrt': ['hart', 'thar'],
-    'ailm': ['mail', 'liam'],
-    'ailv': ['vail', 'vial'],
-    'ainp': ['pain', 'nipa'],
-    'alot': ['alto', 'tola', 'lota'],
-    'alry': ['lary', 'lyre'],
-    'amst': ['mast', 'tams'],
-    'anps': ['snap', 'span'],
-    'anpt': ['pant', 'tapn'],
-    'anrt': ['rant', 'tarn'],
-    'anst': ['ants', 'stan'],
-    'cort': ['cort', 'troc'],
-    'eikl': ['like', 'kile'],
-    'eilv': ['evil', 'live', 'veil', 'vile'],
-    'eilm': ['lime', 'mile'],
-    'eimn': ['mine', 'mien'],
-    'eimr': ['mire', 'rime'],
-    'eist': ['site', 'ties'],
-    'eitt': ['tide', 'tied'],
-    'elov': ['love', 'vole'],
-    'emor': ['more', 'rome'],
-    'enrt': ['rent', 'tern'],
-    'eprv': ['prev', 'verp'],
-    'eopst': ['poets', 'poset', 'stope', 'topes'],
-    'efir': ['fire'],
-    'eflow': ['fowl', 'wolf'],
-    'egir': ['gire'],
-    // Additional common anagrams
-    'act': ['cat', 'act'],
-    'adept': ['taped', 'pated', 'adept'],
-    'agert': ['great', 'grate'],
-    'ahst': ['hats', 'shat'],
-    'ainst': ['saint', 'stain', 'satin'],
-    'bnor': ['born'],
-    'dlor': ['lord'],
-    'dlo': ['old'],
-    'eirw': ['wire', 'wier'],
-    'eors': ['rose', 'sore'],
-    'elpsa': ['lapse', 'pales', 'leaps'],
-    'enw': ['new'],
-    'egnra': ['range', 'anger'],
-    'eilv': ['evil', 'live', 'veil'],
-    'fost': ['soft', 'fots'],
-    'ghin': ['thing'],
-    'iklln': ['killn'],
-    'ikwll': ['will', 'likw'],
-    'impt': ['limp', 'pilt'],
-    'klwaa': ['walk'],
-    'krow': ['work'],
-    'laep': ['leap', 'pale', 'peal'],
-    'loev': ['love'],
-    'meti': ['time', 'item', 'mite'],
-    'msut': ['must'],
-    'now': ['now', 'won'],
-    'onew': ['wone'],
-    'orwd': ['word', 'dowr'],
-    'ouy': ['you'],
-    'port': ['port', 'trop'],
-    'poto': ['poot'],
-    'psuh': ['push'],
-    'rea': ['are', 'ear'],
-    'rnu': ['run'],
-    'shit': ['this', 'hits'],
-    'taht': ['that', 'tath'],
-    'tac': ['cat', 'act'],
-    'teg': ['get'],
-    'thgi': ['tight'],
-    'thgim': ['might'],
-    'thgir': ['right'],
-    'thgil': ['light'],
-    'thgin': ['night', 'thing'],
-    'trop': ['port', 'trop'],
-    'tuo': ['out'],
-    'veha': ['have'],
-    'veom': ['move'],
-    'woh': ['how'],
-    'won': ['now', 'won'],
-    'yam': ['may'],
-    'yaw': ['way'],
-  };
-  
-  // Common English words to check
-  const commonWords = [
-    // Most common English words that might appear
-    "the", "and", "that", "have", "for", "not", "with", "you", "this", "but", "his", "from", "they",
-    "say", "she", "will", "one", "all", "would", "there", "their", "what", "out", "about",
-    "who", "get", "which", "when", "make", "can", "like", "time", "just", "him", "know",
-    "take", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than",
-    "then", "now", "look", "only", "come", "its", "over", "think", "also", "back", "after",
-    "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", "want",
-    "because", "any", "these", "give", "day", "most", "creative", "design", "poem", "word",
-    "art", "life", "dream", "flow", "nature", "mind", "idea", "form", "light", "dark", "space",
-    "echo", "voice", "sound", "image", "color", "shape", "move", "pulse", "wave", "rhythm",
-    "energy", "being", "soul", "earth", "water", "fire", "air", "void", "chaos", "order",
-    "about", "above", "across", "act", "active", "add", "afraid", "after", "again", "age",
-    "ago", "agree", "air", "allow", "alone", "along", "already", "always", "am", "amount",
-    "an", "ancient", "anger", "angry", "animal", "answer", "any", "anyone", "anything",
-    "appear", "apple", "are", "area", "arm", "army", "around", "arrive", "art", "as", "ask",
-    "at", "away", "baby", "back", "bad", "bag", "ball", "bank", "base", "basket", "bath", "be",
-    "beautiful", "bed", "bee", "been", "before", "begin", "behind", "bell", "belong", "below",
-    "beside", "best", "better", "between", "big", "bird", "birth", "birthday", "bit", "bite",
-    "black", "blame", "blank", "blind", "block", "blood", "blow", "blue", "board", "boat",
-    "body", "book", "border", "born", "both", "bottle", "bottom", "bowl", "box", "boy",
-    "branch", "brave", "bread", "break", "breath", "bridge", "bright", "bring", "brother",
-    "brown", "brush", "build", "burn", "bus", "busy", "but", "buy", "by", "cake", "call",
-    "can", "candle", "cap", "car", "card", "care", "carry", "case", "cat", "catch", "cause",
-    "center", "certain", "chain", "chair", "chance", "change", "chase", "cheap", "cheese"
-  ];
-  
-  // Check if the exact anagram is in our predefined set
-  if (predefinedAnagrams[letterSort]) {
-    possibleWords.push(...predefinedAnagrams[letterSort]);
+  // Special handling for 5-letter combinations
+  if (letters.length >= 5) {
+    const fiveLetterWords = enhancedWordGenerator.generate5LetterWords(letters);
+    console.log(`🎯 Found ${fiveLetterWords.length} five-letter words:`, fiveLetterWords);
   }
   
-  // Check if any subsets of our letters form valid words
-  // This is more comprehensive than the previous approach
-  let letterArr = letters.toLowerCase().split('');
-  
-  // First check if the whole string is a valid word
-  if (commonWords.includes(letters.toLowerCase())) {
-    possibleWords.push(letters.toLowerCase());
+  // Enhanced word detection: also try to generate longer words if we have enough letters
+  if (letters.length >= 6) {
+    const longerWords = enhancedWordGenerator.generateLongestWords(letters, 6);
+    console.log(`📏 Found ${longerWords.length} words prioritizing 6-letter combinations:`, longerWords.slice(0, 5));
   }
-  
-  // Generate subsets of letters (3 or more characters)
-  const minWordLength = CONFIG.wordSettings.minClusterSize || 3;
-  
-  // Generate all possible subsets of the letters
-  function generateSubsets(chars, minLen, maxLen) {
-    const result = [];
-    
-    function backtrack(start, current) {
-      // If current subset is within our length constraints, add it
-      if (current.length >= minLen && current.length <= maxLen) {
-        result.push(current.join(''));
-      }
-      
-      // If we've reached max length, return
-      if (current.length === maxLen) return;
-      
-      // Try adding each remaining character
-      for (let i = start; i < chars.length; i++) {
-        current.push(chars[i]);
-        backtrack(i + 1, current);
-        current.pop();
-      }
-    }
-    
-    backtrack(0, []);
-    return result;
-  }
-  
-  // Generate subsets between minWordLength and letter array length
-  const subsets = generateSubsets(letterArr, minWordLength, letterArr.length);
-  
-  // Check each subset against our common words list
-  for (const subset of subsets) {
-    if (commonWords.includes(subset)) {
-      possibleWords.push(subset);
-    }
-    
-    // Also check permutations of this subset
-    const sortedSubset = subset.split('').sort().join('');
-    if (predefinedAnagrams[sortedSubset]) {
-      possibleWords.push(...predefinedAnagrams[sortedSubset]);
-    }
-  }
-  
-  // Deduplicate the list
-  possibleWords = [...new Set(possibleWords)];
-  
-  // Sort by length (longer words first) for better presentation
-  possibleWords.sort((a, b) => b.length - a.length);
   
   // Log for debugging
-      if (possibleWords.length > 0) {
-      console.log(`✅ FOUND ${possibleWords.length} POSSIBLE WORDS from letters: ${letters}`);
-      console.log("Words:", possibleWords);
-    } else {
-      console.log(`❌ No words found from letters: ${letters}`);
+  if (possibleWords.length > 0) {
+    console.log(`✅ FOUND ${possibleWords.length} POSSIBLE WORDS from letters: ${letters}`);
+    console.log("Words:", possibleWords.slice(0, 10)); // Show first 10
+  } else {
+    console.log(`❌ No words found from letters: ${letters}`);
+    
+    // Try suggestions if no direct words found
+    const suggestions = enhancedWordGenerator.getSuggestions(letters, 5);
+    if (suggestions.length > 0) {
+      console.log(`💡 Word suggestions based on available letters:`, suggestions.slice(0, 5));
     }
+  }
   
   return possibleWords;
 }
@@ -4729,7 +5367,7 @@ function confirmWord(clusterId, wordString, organisms, currentTime, definition, 
   // Remove from potential clusters to avoid duplicate confirmations
   potentialClusters.delete(clusterId);
   
-  // Automatically collect the word
+  // Automatically collect the word - ENHANCED VERSION
   // Don't exceed max collected words
   if (collectedWords.length < CONFIG.wordSettings.maxCollectedWords) {
     // Check if word already exists in collection to avoid duplicates
@@ -4744,8 +5382,9 @@ function confirmWord(clusterId, wordString, organisms, currentTime, definition, 
         source: "auto-detection"
       });
       
-      console.log(`Automatically collected word: ${wordString}`);
-      console.log("Current collection:", collectedWords.map(w => w.word).join(", "));
+      console.log(`✅ WORD SUCCESSFULLY COLLECTED: ${wordString}`);
+      console.log(`📝 Total words collected: ${collectedWords.length}`);
+      console.log("🔤 Current collection:", collectedWords.map(w => w.word).join(", "));
       
       // Play a more distinctive sound for word collection
       if (CONFIG.audioEnabled) {
@@ -4762,10 +5401,10 @@ function confirmWord(clusterId, wordString, organisms, currentTime, definition, 
         }
       }
       
-      // Show a more prominent notification
+      // Enhanced notification system
       let notificationElement = document.getElementById("notification");
       if (notificationElement) {
-        notificationElement.innerHTML = `<strong>WORD COLLECTED:</strong> ${wordString.toUpperCase()}`;
+        notificationElement.innerHTML = `<strong>✨ WORD COLLECTED:</strong> ${wordString.toUpperCase()}`;
         notificationElement.classList.add("visible");
         notificationElement.classList.add("word-collected");
         setTimeout(() => { 
@@ -4773,15 +5412,27 @@ function confirmWord(clusterId, wordString, organisms, currentTime, definition, 
           notificationElement.classList.remove("word-collected");
         }, 3500);
       }
+      
+      // Immediately update the word list UI after collection
+      console.log("🔄 Updating word list UI...");
+      updateWordList();
+      
+      // Verify the update worked
+      setTimeout(() => {
+        const wordListContent = document.getElementById('wordListContent');
+        if (wordListContent) {
+          console.log(`✅ Word list UI updated. Content: ${wordListContent.children.length} items`);
+        } else {
+          console.error("❌ Word list content element not found!");
+        }
+      }, 100);
+      
     } else {
-      console.log(`Word "${wordString}" already in collection.`);
+      console.log(`⚠️ Word "${wordString}" already in collection.`);
     }
   } else {
-    console.log("Word collection full! Cannot collect more words.");
+    console.log("❌ Word collection full! Cannot collect more words.");
   }
-  
-  // Update the word list UI
-  updateWordList();
 }
 
 // Function to display confirmed words in the 3D environment
@@ -4913,6 +5564,81 @@ function displayConfirmedWords() {
   // Update the word list box UI
   updateWordList();
 } // End of displayConfirmedWords
+
+// Display verse words and provide interactive hints
+function displayVerseWords() {
+  if (verseWords.length === 0) {
+    // Display instruction text when no words are placed yet
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    fill(255, 255, 255, 150);
+    translate(0, 0, 0);
+    
+    // Billboard text to always face camera
+    rotateY(-cameraRotation.y);
+    rotateX(-cameraRotation.x);
+    
+    text("Select words from your palette", 0, -50);
+    text("Click in 3D space to place them", 0, 0);
+    text("Create your verse", 0, 50);
+    pop();
+    return;
+  }
+  
+  // Display verse statistics and information
+  push();
+  textAlign(LEFT, TOP);
+  textSize(20);
+  fill(255, 255, 255, 200);
+  translate(-width/2 + 50, -height/2 + 100, 100);
+  
+  // Billboard text to always face camera
+  rotateY(-cameraRotation.y);
+  rotateX(-cameraRotation.x);
+  
+  text(`Verse: ${currentVerse.title}`, 0, 0);
+  text(`Words placed: ${verseWords.length}`, 0, 30);
+  
+  if (selectedWordForPlacement) {
+    text(`Selected: "${selectedWordForPlacement}"`, 0, 60);
+    text("Click in space to place", 0, 90);
+  } else {
+    text("Select a word to place", 0, 60);
+  }
+  
+  pop();
+  
+  // The Three.js meshes are already being rendered by the Three.js renderer
+  // We just need to add some interactive elements here if needed
+  
+  // Draw selection indicators around verse words when hovering
+  for (let i = 0; i < verseWords.length; i++) {
+    const vw = verseWords[i];
+    if (vw.mesh) {
+      // Add subtle glow effect around placed words
+      push();
+      translate(vw.position.x, vw.position.y, vw.position.z);
+      
+      // Billboard effect
+      rotateY(-cameraRotation.y);
+      rotateX(-cameraRotation.x);
+      
+      // Draw subtle glow
+      noStroke();
+      fill(255, 100, 100, 30 + sin(frameCount * 0.05 + i) * 15);
+      ellipse(0, 0, vw.word.length * 20 + 40, 80);
+      
+      // Draw word number/index
+      fill(255, 255, 255, 100);
+      textAlign(CENTER, CENTER);
+      textSize(12);
+      text(`${i + 1}`, 0, -40);
+      
+      pop();
+    }
+  }
+}
 
 
 // Apply flocking behaviors (separation, alignment, cohesion) in 3D space
@@ -5133,6 +5859,14 @@ function setupUI() {
     });
   }
 
+  // Verse mode toggle
+  const verseModeToggle = document.getElementById("verse-mode-toggle");
+  if (verseModeToggle) {
+    verseModeToggle.addEventListener("click", () => {
+      toggleVerseMode();
+    });
+  }
+
   // Palette toggle
   const paletteToggle = document.getElementById("palette-toggle");
 
@@ -5167,9 +5901,75 @@ function setupUI() {
     });
   }
 
+    // Verse panel controls
+  const saveVerseBtn = document.getElementById("save-verse-btn");
+  const exportTextBtn = document.getElementById("export-text-btn");
+  const exportJsonBtn = document.getElementById("export-json-btn");
+  const exportScreenshotBtn = document.getElementById("export-screenshot-btn");
+  const clearVerseBtn = document.getElementById("clear-verse-btn");
+  const verseTitleInput = document.getElementById("verse-title");
+  
+  if (saveVerseBtn) {
+    saveVerseBtn.addEventListener("click", () => {
+      saveCurrentVerse();
+    });
+  }
+  
+  if (exportTextBtn) {
+    exportTextBtn.addEventListener("click", () => {
+      exportVerseAsText();
+    });
+  }
+  
+  if (exportJsonBtn) {
+    exportJsonBtn.addEventListener("click", () => {
+      exportVerseAsJSON();
+    });
+  }
+  
+  if (exportScreenshotBtn) {
+    exportScreenshotBtn.addEventListener("click", () => {
+      exportVerseAsScreenshot();
+    });
+  }
+  
+  if (clearVerseBtn) {
+    clearVerseBtn.addEventListener("click", () => {
+      clearCurrentVerse();
+    });
+  }
+
+  if (verseTitleInput) {
+    verseTitleInput.addEventListener("input", (e) => {
+      currentVerse.title = e.target.value;
+    });
+  }
+
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
+    // Check if user is typing in an input field
+    const activeElement = document.activeElement;
+    const isTyping = activeElement && (
+      activeElement.tagName === 'INPUT' || 
+      activeElement.tagName === 'TEXTAREA' || 
+      activeElement.contentEditable === 'true'
+    );
+    
+    // If user is typing, only allow specific shortcuts
+    if (isTyping) {
+      console.log("🔤 User is typing, ignoring most shortcuts");
+      // Only allow escape to unfocus
+      if (e.key === 'Escape') {
+        activeElement.blur();
+        console.log("👋 Unfocused input via Escape key");
+      }
+      return; // Don't process other shortcuts when typing
+    }
+    
     switch (e.key.toLowerCase()) {
+      case "v":
+        toggleVerseMode();
+        break;
       case "c":
         cycleHighlightScript(); // NEW: Now cycles script highlight modes
         break;
@@ -5184,59 +5984,419 @@ function setupUI() {
       case "r":
         window.resetCamera();
         break;
+      case "t":
+        // Test the word input functionality
+        if (window.testWordInput) {
+          window.testWordInput();
+        }
+        break;
+      case "w":
+        // Focus the word input for typing
+        const wordInput = document.getElementById('wordInput');
+        if (wordInput) {
+          wordInput.focus();
+          console.log("🎯 Word input focused via keyboard shortcut");
+        }
+        break;
     }
   });
 
   // Update stats initially
   updateStats();
   
-  // Then create the wordListBox with improved visibility
+  // Then create the wordListBox with MAXIMUM visibility
   const wordListBox = document.createElement('div');
   wordListBox.id = 'wordListBox';
-  wordListBox.style.position = 'fixed';
-  wordListBox.style.bottom = '32px';
-  wordListBox.style.right = '32px';
-  wordListBox.style.width = '220px'; // Same as statsDiv
-  wordListBox.style.height = '150px';
-  wordListBox.style.background = 'rgba(0,0,0,0.85)'; // Increased opacity
-  wordListBox.style.color = 'white';
-  wordListBox.style.border = '1px solid #888'; // Brighter border
-  wordListBox.style.borderRadius = '5px';
-  wordListBox.style.padding = '10px';
-  wordListBox.style.fontFamily = 'Arial, sans-serif';
-  wordListBox.style.fontSize = '12px';
-  wordListBox.style.zIndex = '1000'; // Ensure it's on top
-  wordListBox.style.boxShadow = '0 0 10px rgba(255,255,255,0.2)'; // Add glow
+  wordListBox.className = 'collected-words-panel';
   document.body.appendChild(wordListBox);
+  
+  console.log("📦 Word collection box created and styled");
 
   // Using the global variable declared at the top
-  wordListTitle = document.createElement('h4');
-  wordListTitle.textContent = 'COLLECTED WORDS';
-  wordListTitle.style.margin = '0 0 8px 0';
-  wordListTitle.style.paddingBottom = '5px';
-  wordListTitle.style.borderBottom = '1px solid #888'; // Brighter border
-  wordListTitle.style.fontWeight = 'bold';
-  wordListTitle.style.fontSize = '14px'; // Increased font size
-  wordListTitle.style.letterSpacing = '1px'; // Add letter spacing
-  wordListTitle.style.textAlign = 'center'; // Center the title
+  wordListTitle = document.createElement('div');
+  wordListTitle.className = 'collected-words-header';
+  wordListTitle.innerHTML = `
+    <h3 class="collected-words-title">POET'S PALETTE</h3>
+    <div class="collected-words-count" id="collected-count">0 WORDS</div>
+  `;
   wordListBox.appendChild(wordListTitle);
+  
+  console.log("📝 Word collection title created");
+
+  // Create word input area for the poet's palette
+  const wordInputArea = document.createElement('div');
+  wordInputArea.className = 'word-input-area';
+  wordInputArea.innerHTML = `
+    <textarea 
+      id="wordInput" 
+      class="word-input-field" 
+      placeholder="Type words to add to your palette...
+
+• Enter: Add words to palette
+• Ctrl+Enter: Create 3D poetry directly
+• Escape: Exit typing mode
+
+Keyboard shortcuts are disabled while typing."
+      rows="3"
+    ></textarea>
+    <div class="word-input-controls">
+      <button id="addWordsBtn" class="word-input-btn primary">Add Words</button>
+      <button id="create3DPoetryBtn" class="word-input-btn secondary">Create 3D Poetry</button>
+      <button id="clearInputBtn" class="word-input-btn tertiary">Clear</button>
+    </div>
+  `;
+  wordListBox.appendChild(wordInputArea);
 
   // Create word list content container using the global variable
   wordListContent = document.createElement('div');
   wordListContent.id = 'wordListContent';
-  
-  // Calculate available height for content dynamically
-  // Box inner height is 150px - 2*10px padding = 130px.
-  // Title approx height: 13px font + 8px margin-bottom + 5px padding-bottom ~ 26px.
-  // Initial calculation:
-  let contentHeightCalc = 130 - 26; // Approximately
-  // Fallback if title offsetHeight isn't ready during initial call:
-  if (wordListTitle && typeof wordListTitle.offsetHeight !== 'undefined' && wordListTitle.offsetHeight > 0) {
-    contentHeightCalc = 130 - (wordListTitle.offsetHeight + parseInt(wordListTitle.style.marginBottom || '0') + parseInt(wordListTitle.style.paddingBottom || '0'));
-  }
-  wordListContent.style.height = Math.max(20, contentHeightCalc) + 'px'; // Ensure a minimum height
-  wordListContent.style.overflowY = 'auto'; // Make this part scrollable
+  wordListContent.className = 'collected-words-content';
   wordListBox.appendChild(wordListContent);
+
+  // Setup word input functionality after elements are created
+  // Add a small delay to ensure DOM elements are properly attached
+  setTimeout(() => {
+    setupWordInputHandlers();
+  }, 100);
+}
+
+// Setup word input handlers for the poet's palette
+function setupWordInputHandlers() {
+  console.log("🔧 Setting up word input handlers...");
+  
+  const wordInput = document.getElementById('wordInput');
+  const addWordsBtn = document.getElementById('addWordsBtn');
+  const create3DPoetryBtn = document.getElementById('create3DPoetryBtn');
+  const clearInputBtn = document.getElementById('clearInputBtn');
+
+  console.log("Elements found:", {
+    wordInput: !!wordInput,
+    addWordsBtn: !!addWordsBtn,
+    create3DPoetryBtn: !!create3DPoetryBtn,
+    clearInputBtn: !!clearInputBtn
+  });
+
+  if (!wordInput || !addWordsBtn || !create3DPoetryBtn || !clearInputBtn) {
+    console.warn("❌ Word input elements not found, retrying in 500ms...");
+    setTimeout(setupWordInputHandlers, 500);
+    return;
+  }
+
+  console.log("✅ All word input elements found, setting up event listeners...");
+
+  // Add click event listener for debugging
+  wordInput.addEventListener('click', (e) => {
+    console.log("🎯 Text input clicked directly!");
+    console.log("Event target:", e.target);
+    console.log("Active element before focus:", document.activeElement);
+    // Force focus if not already focused
+    if (document.activeElement !== wordInput) {
+      console.log("💫 Forcing focus on text input");
+      wordInput.focus();
+    }
+  });
+
+  // Add mousedown event for more debugging
+  wordInput.addEventListener('mousedown', (e) => {
+    console.log("⬇️ Mouse down on text input");
+    e.stopPropagation(); // Prevent p5.js from handling this event
+  });
+
+  // Handle textarea keyboard shortcuts
+  wordInput.addEventListener('keydown', (e) => {
+    console.log("🎹 Key pressed in word input:", e.key);
+    if (e.key === 'Enter') {
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl+Enter: Create 3D poetry directly
+        console.log("🎨 Creating 3D poetry from Ctrl+Enter");
+        e.preventDefault();
+        handleCreate3DPoetry();
+      } else {
+        // Enter: Add words to palette
+        console.log("📝 Adding words from Enter key");
+        e.preventDefault();
+        handleAddWords();
+      }
+    }
+  });
+
+  // Add input event to check if typing works
+  wordInput.addEventListener('input', (e) => {
+    console.log("✏️ Input detected:", e.target.value);
+  });
+
+  // Add focus/blur events for debugging
+  wordInput.addEventListener('focus', () => {
+    console.log("🎯 Word input focused");
+    // Add visual indicator that input is focused
+    wordInput.style.outline = '2px solid #ff3333';
+  });
+
+  wordInput.addEventListener('blur', () => {
+    console.log("💨 Word input blurred");
+    // Remove visual indicator
+    wordInput.style.outline = '';
+  });
+
+  // Button event listeners
+  addWordsBtn.addEventListener('click', (e) => {
+    console.log("🔘 Add Words button clicked");
+    handleAddWords();
+  });
+  
+  create3DPoetryBtn.addEventListener('click', (e) => {
+    console.log("🔘 Create 3D Poetry button clicked");
+    handleCreate3DPoetry();
+  });
+  
+  clearInputBtn.addEventListener('click', (e) => {
+    console.log("🔘 Clear button clicked");
+    wordInput.value = '';
+    wordInput.focus();
+  });
+
+  // Make sure the input is focusable
+  wordInput.setAttribute('tabindex', '0');
+  
+  console.log("🎉 Word input handlers setup complete!");
+  
+  // Test the input by trying to focus it
+  setTimeout(() => {
+    console.log("🧪 Testing word input focus...");
+    wordInput.focus();
+    console.log("📍 Input focused. Active element:", document.activeElement === wordInput ? "CORRECT" : "FAILED");
+  }, 1000);
+}
+
+// TEST function - can be called from console to test the input
+window.testWordInput = function() {
+  const wordInput = document.getElementById('wordInput');
+  if (wordInput) {
+    console.log("🧪 Testing word input...");
+    wordInput.focus();
+    wordInput.value = "hello world test";
+    console.log("✅ Test input set, value:", wordInput.value);
+    return true;
+  } else {
+    console.log("❌ Word input not found");
+    return false;
+  }
+};
+
+// Handle adding words to the palette
+function handleAddWords() {
+  const wordInput = document.getElementById('wordInput');
+  if (!wordInput) return;
+
+  const text = wordInput.value.trim();
+  if (!text) {
+    showNotification("Please enter some words first.");
+    return;
+  }
+
+  // Parse words from input (split by spaces, commas, newlines)
+  const words = text.split(/[,\s\n]+/)
+    .map(word => word.trim().toLowerCase())
+    .filter(word => word.length > 0 && /^[a-zA-Z]+$/.test(word)); // Only alphabetic words
+
+  if (words.length === 0) {
+    showNotification("No valid words found. Please enter alphabetic words.");
+    return;
+  }
+
+  // Check capacity
+  const availableSlots = CONFIG.wordSettings.maxCollectedWords - collectedWords.length;
+  if (availableSlots <= 0) {
+    showNotification("Poet's palette is full! Clear some words first.");
+    return;
+  }
+
+  // Add words to collection (up to available slots)
+  const wordsToAdd = words.slice(0, availableSlots);
+  let addedCount = 0;
+
+  wordsToAdd.forEach(word => {
+    // Check if word already exists
+    if (!collectedWords.some(w => w.word === word)) {
+      // Add word to collection
+      collectedWords.push({
+        word: word,
+        definition: "A word from your creative input.",
+        translations: {},
+        source: 'user_input'
+      });
+      addedCount++;
+    }
+  });
+
+  // Clear input and update UI
+  wordInput.value = '';
+  updateWordList();
+
+  // Show notification
+  if (addedCount > 0) {
+    showNotification(`Added ${addedCount} word${addedCount !== 1 ? 's' : ''} to your palette: ${wordsToAdd.slice(0, addedCount).join(', ')}`);
+    
+    // Play sound for word addition
+    if (audioEnabled) {
+      try {
+        playSound(350 + (addedCount * 25), 0);
+      } catch (e) {
+        console.warn("Could not play word addition sound:", e);
+      }
+    }
+  } else {
+    showNotification("All words were already in your palette.");
+  }
+
+  console.log(`📝 Added ${addedCount} words to palette:`, wordsToAdd.slice(0, addedCount));
+}
+
+// Handle creating 3D poetry directly in space
+function handleCreate3DPoetry() {
+  const wordInput = document.getElementById('wordInput');
+  if (!wordInput) return;
+
+  const text = wordInput.value.trim();
+  if (!text) {
+    showNotification("Please enter some text first.");
+    return;
+  }
+
+  // Parse words from input
+  const words = text.split(/[,\s\n]+/)
+    .map(word => word.trim().toLowerCase())
+    .filter(word => word.length > 0 && /^[a-zA-Z]+$/.test(word));
+
+  if (words.length === 0) {
+    showNotification("No valid words found for 3D poetry.");
+    return;
+  }
+
+  // Create 3D words in a poetic arrangement
+  createPoetryFromWords(words);
+
+  // Clear input
+  wordInput.value = '';
+
+  showNotification(`Created 3D poetry with ${words.length} words!`);
+  console.log("🎨 Created 3D poetry from words:", words);
+}
+
+// Create 3D poetry arrangement from words
+function createPoetryFromWords(words) {
+  if (!defaultFont || !isDefaultFontReady) {
+    showNotification("3D font not ready. Please try again in a moment.");
+    return;
+  }
+
+  const centerX = 0;
+  const centerY = 0;
+  const centerZ = 0;
+  const spacing = 150; // Distance between words
+
+  words.forEach((word, index) => {
+    // Create spiral or flowing arrangement
+    const angle = (index / words.length) * Math.PI * 4; // Multiple spirals
+    const radius = 100 + (index * 30); // Expanding spiral
+    const height = Math.sin(angle * 2) * 100; // Vertical wave
+
+    const position = {
+      x: centerX + Math.cos(angle) * radius,
+      y: centerY + height,
+      z: centerZ + Math.sin(angle) * radius
+    };
+
+    // Create the 3D word mesh
+    const mesh = createPoetryWordMesh(word, position, index);
+    if (mesh) {
+      threeScene.add(mesh);
+      
+      // Store in verseWords for management
+      const verseWord = {
+        word: word,
+        position: position,
+        rotation: { x: 0, y: angle, z: 0 },
+        scale: 1,
+        id: nextVerseWordId++,
+        mesh: mesh,
+        isPoetry: true // Mark as poetry creation
+      };
+      verseWords.push(verseWord);
+
+      // Play sound for each word placement with slight delay
+      if (audioEnabled) {
+        setTimeout(() => {
+          try {
+            playSound(400 + (word.length * 30) + (index * 10), (Math.random() - 0.5) * 0.5);
+          } catch (e) {
+            console.warn("Could not play poetry sound:", e);
+          }
+        }, index * 200);
+      }
+    }
+  });
+
+  updateVerseStats();
+}
+
+// Create a mesh for poetry words (with different styling than verse words)
+function createPoetryWordMesh(word, position, index) {
+  if (!defaultFont || !isDefaultFontReady) {
+    console.warn("Default font not ready for poetry word creation");
+    return null;
+  }
+  
+  try {
+    const textGeometry = new THREE.TextGeometry(word, {
+      font: defaultFont,
+      size: 25 + (word.length * 2), // Size varies with word length
+      height: 8,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 2,
+      bevelSize: 1.5,
+      bevelOffset: 0,
+      bevelSegments: 5
+    });
+    
+    // Center the geometry
+    textGeometry.computeBoundingBox();
+    const centerOffsetX = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
+    const centerOffsetY = -0.5 * (textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y);
+    textGeometry.translate(centerOffsetX, centerOffsetY, 0);
+    
+    // Create material with gradient or varying colors
+    const hue = (index * 60) % 360; // Cycle through colors
+    const color = new THREE.Color(`hsl(${hue}, 70%, 60%)`);
+    
+    const material = new THREE.MeshPhongMaterial({
+      color: color,
+      emissive: new THREE.Color(`hsl(${hue}, 50%, 20%)`),
+      shininess: 120,
+      transparent: true,
+      opacity: 0.9
+    });
+    
+    const mesh = new THREE.Mesh(textGeometry, material);
+    mesh.position.set(position.x, position.y, position.z);
+    mesh.rotation.y = (index * 0.3); // Slight rotation variation
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    
+    // Mark this mesh as a poetry word
+    mesh.userData = { 
+      isVerseWord: true, 
+      isPoetry: true,
+      word: word,
+      index: index
+    };
+    
+    return mesh;
+  } catch (error) {
+    console.error("Failed to create poetry word mesh:", error);
+    return null;
+  }
 }
 
 // Mouse click in 3D space
@@ -5252,18 +6412,32 @@ function mousePressed() {
   }
   // Handle LEFT mouse button
   else if (mouseButton === LEFT) {
-    if (!isMouseOverUI()) {
-      // Check if the user clicked on a confirmed word
-      if (tryClickConfirmedWord()) {
-        // Handled by the word click function
-        return false;
-      }
-      
-      // No longer creating new organisms on left-click
+    // If clicking over UI elements, allow default behavior for normal interaction
+    if (isMouseOverUI()) {
+      console.log("🖱️ Mouse clicked over UI element - allowing default behavior");
+      return true; // Allow default behavior for UI interactions
     }
-    return false; // Prevent default action
+    
+    // Only handle 3D scene interactions when NOT over UI
+    // Verse mode: place selected word in 3D space
+    if (isVerseMode && selectedWordForPlacement) {
+      const position = mousePositionTo3D();
+      placeWordInVerse(position);
+      return false;
+    }
+    
+    // Letter mode: check if the user clicked on a confirmed word
+    if (!isVerseMode && tryClickConfirmedWord()) {
+      // Handled by the word click function
+      return false;
+    }
+    
+    // Prevent default action only for 3D scene area (not over UI)
+    return false;
   }
-  // Allow default behavior if over UI or other mouse buttons for future use
+  
+  // Allow default behavior for other mouse buttons or unhandled cases
+  return true;
 }
 
 // Try to click on a confirmed word
@@ -5404,82 +6578,86 @@ function collectWord(word) {
   updateWordList();
 }
 
-// Function to update the word list display
+// Function to update the word list display - ENHANCED VERSION
 function updateWordList() {
+  console.log(`🎯 updateWordList called. Total words: ${collectedWords.length}`);
+  
   const wordListContent = document.getElementById('wordListContent');
-  if (wordListContent) {
-    wordListContent.innerHTML = ''; // Clear previous words
-
-    // Sort words alphabetically for better presentation
-    const sortedWords = [...collectedWords].sort((a, b) => a.word.localeCompare(b.word));
-    
-    // Add each collected word with enhanced styling
-    for (let i = 0; i < sortedWords.length; i++) {
-      const wordObj = sortedWords[i]; 
-      const wordP = document.createElement('p');
-      
-      // Format word with capitalization
-      const formattedWord = wordObj.word.charAt(0).toUpperCase() + wordObj.word.slice(1).toLowerCase();
-      wordP.innerHTML = `<span class="word-text">${formattedWord}</span>`;
-      
-      // Add tooltip with definition
-      if (wordObj.definition) {
-        wordP.title = wordObj.definition;
-      }
-      
-      // Apply enhanced styling
-      wordP.className = "collected-word";
-      wordP.style.margin = '5px 0';
-      wordP.style.padding = '4px 6px';
-      wordP.style.fontSize = '13px';
-      wordP.style.lineHeight = '1.4';
-      wordP.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-      wordP.style.borderRadius = '3px';
-      wordP.style.transition = 'all 0.3s ease';
-      wordP.style.cursor = 'pointer';
-      
-      // Add hover effect
-      wordP.addEventListener('mouseenter', function() {
-        this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        this.style.transform = 'translateX(3px)';
-      });
-      
-      wordP.addEventListener('mouseleave', function() {
-        this.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-        this.style.transform = 'translateX(0)';
-      });
-      
-      // Add click handler to show definition
-      wordP.addEventListener('click', function() {
-        const definition = wordObj.definition || "A word discovered in the environment.";
-        const notificationElement = document.getElementById("notification");
-        if (notificationElement) {
-          notificationElement.innerHTML = `<strong>${formattedWord}:</strong> ${definition}`;
-          notificationElement.classList.add("visible");
-          setTimeout(() => { notificationElement.classList.remove("visible"); }, 3000);
-        }
-      });
-      
-      wordListContent.appendChild(wordP);
-    }
-    
-    // If no words yet, show a helpful message
-    if (collectedWords.length === 0) {
-      const emptyMessage = document.createElement('p');
-      emptyMessage.textContent = "Interact with the environment to form words.";
-      emptyMessage.style.fontStyle = 'italic';
-      emptyMessage.style.color = '#999';
-      emptyMessage.style.textAlign = 'center';
-      emptyMessage.style.padding = '20px 10px';
-      wordListContent.appendChild(emptyMessage);
-    }
+  if (!wordListContent) {
+    console.error("❌ ERROR: wordListContent element not found! Creating it...");
+    // Try to recreate the UI if it's missing
+    setupUI();
+    return;
   }
   
-  // Update word count display
+  // Update the word count in the header
+  const collectedCountEl = document.getElementById('collected-count');
+  if (collectedCountEl) {
+    collectedCountEl.textContent = `${collectedWords.length} WORD${collectedWords.length !== 1 ? 'S' : ''}`;
+  }
+  
+  console.log("📋 Clearing word list content...");
+  wordListContent.innerHTML = ''; // Clear previous words
+
+  // Sort words alphabetically for better presentation
+  const sortedWords = [...collectedWords].sort((a, b) => a.word.localeCompare(b.word));
+  
+  console.log(`📝 Displaying ${sortedWords.length} words in UI`);
+  
+  // Add each collected word with enhanced styling
+  for (let i = 0; i < sortedWords.length; i++) {
+    const wordObj = sortedWords[i]; 
+    const wordDiv = document.createElement('div');
+    
+    // Format word with capitalization
+    const formattedWord = wordObj.word.charAt(0).toUpperCase() + wordObj.word.slice(1).toLowerCase();
+    wordDiv.innerHTML = `<span class="word-text">${formattedWord}</span>`;
+    
+    // Add tooltip with definition
+    if (wordObj.definition) {
+      wordDiv.title = wordObj.definition;
+    }
+    
+    // Apply enhanced styling using CSS classes
+    wordDiv.className = "collected-word";
+    
+    // Add click handler to show definition
+    wordDiv.addEventListener('click', function() {
+      const definition = wordObj.definition || "A word discovered in the environment.";
+      const notificationElement = document.getElementById("notification");
+      if (notificationElement) {
+        notificationElement.innerHTML = `<strong>${formattedWord}:</strong> ${definition}`;
+        notificationElement.classList.add("visible");
+        setTimeout(() => { notificationElement.classList.remove("visible"); }, 3000);
+      }
+    });
+    
+    wordListContent.appendChild(wordDiv);
+    console.log(`✅ Added word "${formattedWord}" to UI`);
+  }
+  
+  // Apply verse mode styling if needed
+  if (isVerseMode) {
+    updateWordListForVerseMode();
+  }
+  
+  // If no words yet, show a helpful message
+  if (collectedWords.length === 0) {
+    const emptyMessage = document.createElement('div');
+    emptyMessage.className = 'collected-words-empty';
+    emptyMessage.textContent = "Interact with the environment to discover words and build your collection.";
+    wordListContent.appendChild(emptyMessage);
+    console.log("📝 Added empty state message");
+  }
+  
+  // Update word count display for other UI elements
   const wordCountEl = document.getElementById("wordCount");
   if (wordCountEl) {
     wordCountEl.textContent = `WORDS: ${collectedWords.length}`;
+    console.log(`🔢 Updated word count: ${collectedWords.length}`);
   }
+  
+  console.log("✅ Word list UI update complete!");
 }
 
 // Cycle through color palettes
@@ -5542,6 +6720,399 @@ function cycleHighlightScript() {
   }
 }
 // END NEW
+
+// Toggle between letter mode and verse creation mode
+function toggleVerseMode() {
+  isVerseMode = !isVerseMode;
+  
+  const verseModeBtn = document.getElementById("verse-mode-toggle");
+  const versePanel = document.getElementById("verse-panel");
+  
+  if (isVerseMode) {
+    // Entering verse mode
+    verseModeBtn.classList.add("active");
+    versePanel.classList.remove("hidden");
+    
+    // Update collected words to be selectable
+    updateWordListForVerseMode();
+    
+    // Completely clear the entire 3D space for verse mode
+    clearSpaceForVerseMode();
+    
+    console.log("🎨 Entered verse creation mode - letter generation disabled");
+  } else {
+    // Exiting verse mode
+    verseModeBtn.classList.remove("active");
+    versePanel.classList.add("hidden");
+    
+    // Clear verse selection state
+    selectedWordForPlacement = null;
+    clearVerseSelectionUI();
+    
+    // Clear verse words from 3D space
+    clearVerseWords();
+    
+    // Reinitialize organisms for letter mode
+    initializeOrganisms();
+    
+    console.log("🔤 Returned to letter mode - letter generation enabled");
+  }
+  
+  updateVerseStats();
+}
+
+// Clear verse words from 3D space
+function clearVerseWords() {
+  verseWords.forEach(verseWord => {
+    if (verseWord.mesh && threeScene) {
+      threeScene.remove(verseWord.mesh);
+      if (verseWord.mesh.geometry) verseWord.mesh.geometry.dispose();
+      if (verseWord.mesh.material) verseWord.mesh.material.dispose();
+    }
+  });
+  verseWords = [];
+  currentVerse.words = [];
+}
+
+// Update word list for verse mode selection
+function updateWordListForVerseMode() {
+  const wordElements = document.querySelectorAll('.collected-word');
+  
+  if (isVerseMode) {
+    wordElements.forEach(el => {
+      el.classList.add('verse-selectable');
+      el.addEventListener('click', handleWordSelection);
+    });
+  } else {
+    wordElements.forEach(el => {
+      el.classList.remove('verse-selectable', 'verse-selected');
+      el.removeEventListener('click', handleWordSelection);
+    });
+  }
+}
+
+// Handle word selection for placement
+function handleWordSelection(event) {
+  if (!isVerseMode) return;
+  
+  // Clear previous selection
+  clearVerseSelectionUI();
+  
+  // Mark this word as selected
+  event.currentTarget.classList.add('verse-selected');
+  
+  // Get the word text
+  const wordText = event.currentTarget.querySelector('.word-text').textContent;
+  selectedWordForPlacement = wordText;
+  
+  console.log(`📝 Selected word for placement: ${selectedWordForPlacement}`);
+}
+
+// Clear verse word selection UI
+function clearVerseSelectionUI() {
+  document.querySelectorAll('.collected-word.verse-selected').forEach(el => {
+    el.classList.remove('verse-selected');
+  });
+}
+
+// Update verse statistics
+function updateVerseStats() {
+  const verseWordCountEl = document.getElementById('verse-word-count');
+  if (verseWordCountEl) {
+    verseWordCountEl.textContent = verseWords.length;
+  }
+}
+
+// Show notification to user
+function showNotification(message) {
+  const notificationElement = document.getElementById("notification");
+  if (notificationElement) {
+    notificationElement.innerHTML = message;
+    notificationElement.classList.add("visible");
+    setTimeout(() => { 
+      notificationElement.classList.remove("visible"); 
+    }, 3000);
+  }
+  console.log("📢 Notification:", message);
+}
+
+// Save current verse
+function saveCurrentVerse() {
+  if (verseWords.length === 0) {
+    showNotification("No words placed in verse to save.");
+    return;
+  }
+  
+  const verse = {
+    title: currentVerse.title || "Untitled Verse",
+    words: [...currentVerse.words],
+    createdAt: Date.now()
+  };
+  
+  verses.push(verse);
+  
+  showNotification(`Verse "${verse.title}" saved! Total verses: ${verses.length}`);
+  console.log("📝 Verse saved:", verse);
+}
+
+// Export current verse as plain text
+function exportVerseAsText() {
+  if (verseWords.length === 0) {
+    showNotification("No words placed in verse to export.");
+    return;
+  }
+  
+  // Sort words by their Y position (top to bottom) for natural reading order
+  const sortedWords = [...verseWords].sort((a, b) => b.position.y - a.position.y);
+  
+  const verseText = sortedWords.map(vw => vw.word).join(' ');
+  const title = currentVerse.title || "Untitled Verse";
+  
+  // Create formatted text content
+  const textContent = `${title}\n${'='.repeat(title.length)}\n\n${verseText}\n\n--- Created with Semantic Biome by Parsa Azari ---`;
+  
+  // Create and download text file
+  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${title.replace(/\s+/g, '_')}_verse.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Also copy to clipboard as simple text
+  navigator.clipboard.writeText(verseText).then(() => {
+    showNotification(`Text exported and copied to clipboard: "${verseText}"`);
+  }).catch(() => {
+    showNotification(`Verse exported as text file: "${title}"`);
+  });
+  
+  console.log("📝 Verse exported as text:", { title, text: verseText });
+}
+
+// Export current verse as JSON (with full 3D positioning data)
+function exportVerseAsJSON() {
+  if (verseWords.length === 0) {
+    showNotification("No words placed in verse to export.");
+    return;
+  }
+  
+  // Sort words by their Y position (top to bottom) for natural reading order
+  const sortedWords = [...verseWords].sort((a, b) => b.position.y - a.position.y);
+  
+  const verseText = sortedWords.map(vw => vw.word).join(' ');
+  const exportData = {
+    title: currentVerse.title || "Untitled Verse",
+    text: verseText,
+    wordCount: verseWords.length,
+    words: sortedWords.map(vw => ({
+      word: vw.word,
+      position: vw.position,
+      rotation: vw.rotation,
+      scale: vw.scale,
+      id: vw.id
+    })),
+    createdAt: new Date().toISOString(),
+    createdWith: "Semantic Biome by Parsa Azari",
+    exportFormat: "3D Verse JSON v1.0"
+  };
+  
+  // Create and download JSON file
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${currentVerse.title.replace(/\s+/g, '_')}_verse.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showNotification(`JSON exported: "${exportData.title}" with ${exportData.wordCount} words`);
+  console.log("📋 Verse exported as JSON:", exportData);
+}
+
+// Export current verse as screenshot (JPG)
+function exportVerseAsScreenshot() {
+  if (!threeRenderer || !threeRenderer.domElement) {
+    showNotification("Canvas not ready for screenshot export.");
+    return;
+  }
+  
+  try {
+    // Get the canvas from the three.js renderer
+    const canvas = threeRenderer.domElement;
+    
+    // Create a temporary canvas to combine p5.js and three.js content
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Set the same dimensions as the main canvas
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    
+    // Draw the three.js canvas content
+    tempCtx.drawImage(canvas, 0, 0);
+    
+    // Get the p5.js canvas if available
+    const p5Canvas = document.querySelector('main canvas');
+    if (p5Canvas) {
+      // Draw the p5.js canvas on top (for UI elements, text, etc.)
+      tempCtx.globalCompositeOperation = 'source-over';
+      tempCtx.drawImage(p5Canvas, 0, 0);
+    }
+    
+    // Add title overlay
+    const title = currentVerse.title || "Untitled Verse";
+    tempCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    tempCtx.fillRect(20, 20, title.length * 12 + 40, 60);
+    tempCtx.fillStyle = 'white';
+    tempCtx.font = '24px Space Mono, monospace';
+    tempCtx.fillText(title, 40, 50);
+    
+    // Add subtle watermark
+    tempCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    tempCtx.font = '12px Space Mono, monospace';
+    tempCtx.fillText('Semantic Biome | Parsa Azari', tempCanvas.width - 250, tempCanvas.height - 20);
+    
+    // Convert to blob and download
+    tempCanvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title.replace(/\s+/g, '_')}_verse_${new Date().toISOString().split('T')[0]}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification(`Screenshot exported: "${title}"`);
+        console.log("📷 Screenshot exported:", title);
+      } else {
+        showNotification("Failed to create screenshot.");
+      }
+    }, 'image/jpeg', 0.9);
+    
+  } catch (error) {
+    console.error("Error creating screenshot:", error);
+    showNotification("Error creating screenshot. Please try again.");
+  }
+}
+
+// Clear current verse
+function clearCurrentVerse() {
+  clearVerseWords();
+  selectedWordForPlacement = null;
+  clearVerseSelectionUI();
+  updateVerseStats();
+  
+  // Reset title
+  const verseTitleInput = document.getElementById("verse-title");
+  if (verseTitleInput) {
+    verseTitleInput.value = "Untitled Verse";
+    currentVerse.title = "Untitled Verse";
+  }
+  
+  showNotification("Verse cleared.");
+  console.log("🗑️ Current verse cleared");
+}
+
+// Create 3D text mesh for verse words
+function createVerseWordMesh(word, position) {
+  if (!defaultFont || !isDefaultFontReady) {
+    console.warn("Default font not ready for verse word creation");
+    return null;
+  }
+  
+  try {
+    const textGeometry = new THREE.TextGeometry(word, {
+      font: defaultFont,
+      size: 30,
+      height: 5,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 1,
+      bevelSize: 1,
+      bevelOffset: 0,
+      bevelSegments: 5
+    });
+    
+    // Center the geometry
+    textGeometry.computeBoundingBox();
+    const centerOffsetX = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
+    const centerOffsetY = -0.5 * (textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y);
+    textGeometry.translate(centerOffsetX, centerOffsetY, 0);
+    
+    // Create material with verse-specific styling
+    const material = new THREE.MeshPhongMaterial({
+      color: 0xff3333, // Signature red color
+      emissive: 0x111111,
+      shininess: 100,
+      transparent: true,
+      opacity: 0.9
+    });
+    
+    const mesh = new THREE.Mesh(textGeometry, material);
+    mesh.position.set(position.x, position.y, position.z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    
+    // Mark this mesh as a verse word (NOT a letter organism) so it won't be cleared
+    mesh.userData = { isVerseWord: true, word: word };
+    
+    return mesh;
+  } catch (error) {
+    console.error("Failed to create verse word mesh:", error);
+    return null;
+  }
+}
+
+// Place word in 3D space (called when user clicks in verse mode)
+function placeWordInVerse(position) {
+  if (!selectedWordForPlacement) {
+    showNotification("Select a word from your palette first.");
+    return;
+  }
+  
+  const mesh = createVerseWordMesh(selectedWordForPlacement, position);
+  if (!mesh) {
+    showNotification("Failed to create word mesh.");
+    return;
+  }
+  
+  const verseWord = {
+    word: selectedWordForPlacement,
+    position: { x: position.x, y: position.y, z: position.z },
+    rotation: { x: 0, y: 0, z: 0 },
+    scale: 1,
+    id: nextVerseWordId++,
+    mesh: mesh
+  };
+  
+  verseWords.push(verseWord);
+  currentVerse.words.push(verseWord);
+  threeScene.add(mesh);
+  
+  // Clear selection and update UI
+  selectedWordForPlacement = null;
+  clearVerseSelectionUI();
+  updateVerseStats();
+  
+  // Play sound for placement
+  if (audioEnabled) {
+    try {
+      playSound(400 + (verseWord.word.length * 30), 0);
+    } catch (e) {
+      console.warn("Could not play placement sound:", e);
+    }
+  }
+  
+  showNotification(`Placed "${verseWord.word}" in verse.`);
+  console.log("📍 Word placed in verse:", verseWord);
+}
 
 // Toggle sound on/off
 function toggleSound() {
@@ -6055,6 +7626,8 @@ function isMouseOverUI() {
   let infoEl = document.getElementById("info-panel");
   let qrEl = document.getElementById("qr-code");
   let cameraEl = document.querySelector(".camera-controls");
+  let wordListEl = document.getElementById("wordListBox"); // Add Poet's Palette
+  let versePanelEl = document.getElementById("verse-panel"); // Add verse panel
 
   if (!controlsEl || !infoEl || !qrEl || !cameraEl) return false;
 
@@ -6066,13 +7639,81 @@ function isMouseOverUI() {
   let mouseXWindow = (mouseX / width) * canvasRect.width + canvasRect.left;
   let mouseYWindow = (mouseY / height) * canvasRect.height + canvasRect.top;
 
-  // Check each UI element
-  return (
-    isPointInRect(mouseXWindow, mouseYWindow, controlsEl.getBoundingClientRect()) ||
-    isPointInRect(mouseXWindow, mouseYWindow, infoEl.getBoundingClientRect()) ||
-    isPointInRect(mouseXWindow, mouseYWindow, qrEl.getBoundingClientRect()) ||
-    isPointInRect(mouseXWindow, mouseYWindow, cameraEl.getBoundingClientRect())
-  );
+  // Check each UI element with debugging
+  let overControls = isPointInRect(mouseXWindow, mouseYWindow, controlsEl.getBoundingClientRect());
+  let overInfo = isPointInRect(mouseXWindow, mouseYWindow, infoEl.getBoundingClientRect());
+  let overQr = isPointInRect(mouseXWindow, mouseYWindow, qrEl.getBoundingClientRect());
+  let overCamera = isPointInRect(mouseXWindow, mouseYWindow, cameraEl.getBoundingClientRect());
+  let overWordList = wordListEl && isPointInRect(mouseXWindow, mouseYWindow, wordListEl.getBoundingClientRect());
+  let overVersePanel = versePanelEl && !versePanelEl.classList.contains('hidden') && isPointInRect(mouseXWindow, mouseYWindow, versePanelEl.getBoundingClientRect());
+
+  let result = overControls || overInfo || overQr || overCamera || overWordList || overVersePanel;
+  
+  // Debug logging when mouse is over UI
+  if (result) {
+    console.log("🖱️ Mouse over UI:", {
+      mousePos: {x: mouseXWindow, y: mouseYWindow},
+      overControls, overInfo, overQr, overCamera, overWordList, overVersePanel
+    });
+    
+    // Special debug for word list
+    if (overWordList && wordListEl) {
+      let wordInputEl = document.getElementById('wordInput');
+      if (wordInputEl) {
+        let overWordInput = isPointInRect(mouseXWindow, mouseYWindow, wordInputEl.getBoundingClientRect());
+        console.log("📝 Mouse over word input specifically:", overWordInput);
+      }
+    }
+  }
+
+  return result;
+}
+
+// NEW: Check if mouse is over a scrollable area specifically
+function isMouseOverScrollableArea() {
+  // Check if mouse is over specific scrollable content areas
+  let infoPanelContent = document.querySelector("#info-panel .panel-content");
+  let wordListContent = document.getElementById("wordListContent");
+  let versePanelContent = document.querySelector("#verse-panel .panel-content");
+
+  if (!infoPanelContent && !wordListContent && !versePanelContent) return false;
+
+  // Convert canvas coordinates to window coordinates for correct hit testing
+  let canvasElement = document.querySelector("canvas");
+  if (!canvasElement) return false;
+  
+  let canvasRect = canvasElement.getBoundingClientRect();
+  let mouseXWindow = (mouseX / width) * canvasRect.width + canvasRect.left;
+  let mouseYWindow = (mouseY / height) * canvasRect.height + canvasRect.top;
+
+  // Check scrollable content areas
+  let overScrollableArea = false;
+  
+  // Check info panel content (only if visible)
+  if (infoPanelContent) {
+    let infoPanel = document.getElementById("info-panel");
+    if (infoPanel && !infoPanel.classList.contains('hidden')) {
+      overScrollableArea = overScrollableArea || isPointInRect(mouseXWindow, mouseYWindow, infoPanelContent.getBoundingClientRect());
+    }
+  }
+  
+  // Check word list content (Poet's Palette scrollable area)
+  if (wordListContent) {
+    let wordListBox = document.getElementById("wordListBox");
+    if (wordListBox && wordListBox.style.display !== 'none') {
+      overScrollableArea = overScrollableArea || isPointInRect(mouseXWindow, mouseYWindow, wordListContent.getBoundingClientRect());
+    }
+  }
+  
+  // Check verse panel content (only if visible)
+  if (versePanelContent) {
+    let versePanel = document.getElementById("verse-panel");
+    if (versePanel && !versePanel.classList.contains('hidden')) {
+      overScrollableArea = overScrollableArea || isPointInRect(mouseXWindow, mouseYWindow, versePanelContent.getBoundingClientRect());
+    }
+  }
+
+  return overScrollableArea;
 }
 
 // Helper function to check if a point is inside a rectangle

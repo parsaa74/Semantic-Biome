@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="sketch-container"></div>
+    <script>
+        // Test if our sketch loads without errors
+        console.log("Starting debug test...");
+        
+        // Test basic syntax
+        try {
+            // Test if CONFIG is defined
+            console.log("Testing CONFIG...");
+            
+            // Load the sketch
+            console.log("Loading sketch-3d.js...");
+            
+        } catch (error) {
+            console.error("Error in sketch:", error);
+        }
+    </script>
+    <script src="sketch-3d.js"></script>
+</body>
+</html> 

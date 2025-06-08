@@ -95,13 +95,16 @@
     <div id="moma-tag">Parsa Azari</div>
     
     <div id="controls">
+      <button id="verse-mode-toggle" class="control-btn" aria-label="Toggle verse creation mode">
+        <span class="btn-icon">✎</span>
+      </button>
       <button id="palette-toggle" class="control-btn" aria-label="Change color palette">
         <span class="btn-icon">◐</span>
       </button>
       <button id="sound-toggle" class="control-btn" aria-label="Toggle sound">
         <span class="btn-icon">♪</span>
       </button>
-      <button id="info-toggle" class="control-btn active" aria-label="Show/hide information">
+      <button id="info-toggle" class="control-btn" aria-label="Show/hide information">
         <span class="btn-icon">ⓘ</span>
       </button>
     </div>
@@ -111,13 +114,44 @@
       <div class="camera-btn" id="camera-zoom-in" title="Zoom in">+</div>
       <div class="camera-btn" id="camera-zoom-out" title="Zoom out">−</div>
     </div>
+
+    <!-- Verse creation panel (hidden by default) -->
+    <div id="verse-panel" class="verse-panel hidden">
+      <div class="panel-header">
+        <h2>Verse Creator</h2>
+        <div class="verse-controls">
+          <button id="save-verse-btn" class="verse-btn" title="Save current verse">💾</button>
+          <button id="export-text-btn" class="verse-btn" title="Export verse as plain text">📝</button>
+          <button id="export-json-btn" class="verse-btn" title="Export verse as JSON">📋</button>
+          <button id="export-screenshot-btn" class="verse-btn" title="Export screenshot as JPG">📷</button>
+          <button id="clear-verse-btn" class="verse-btn" title="Clear current verse">🗑️</button>
+        </div>
+      </div>
+      <div class="panel-content">
+        <div class="verse-title-section">
+          <label for="verse-title">Verse Title:</label>
+          <input type="text" id="verse-title" value="Untitled Verse" maxlength="50">
+        </div>
+        <div class="verse-instructions">
+          Click on words from your palette, then click in the 3D space to place them.<br>
+          Export your verse as plain text, JSON data, or screenshot image.
+        </div>
+        <div class="verse-stats">
+          <span>Words placed: <span id="verse-word-count">0</span></span>
+        </div>
+      </div>
+    </div>
     
     <div id="performance-monitor"></div>
     
-    <div id="info-panel">
+    <div id="info-panel" class="hidden">
       <div class="panel-header">
         <h1>Semantic Biome</h1>
-        <button class="learn-more-btn"><div class="qr-border"></div></button>
+        <button class="learn-more-btn" id="github-link" title="View on GitHub">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+        </button>
       </div>
       
       <div class="panel-content">
@@ -127,7 +161,7 @@
         
         <div class="interaction-guide">
           <span class="label">Interaction:</span> 
-          <span>Hover to generate new letters. Drag to rotate the environment. Use mouse wheel to zoom in/out. Your movement influences entity behavior. Use keyboard shortcuts: C (color palette), S (audio toggle), I (info panel), R (clear space and remove words).</span>
+          <span>Hover to generate new letters. Drag to rotate the environment. Use mouse wheel to zoom in/out. Your movement influences entity behavior. Use keyboard shortcuts: V (verse mode toggle), C (color palette), S (audio toggle), I (info panel), R (clear space and remove words), W (focus word input), Escape (exit typing mode). Type words in the Poet's Palette to add them to your collection or create 3D poetry directly in space. Keyboard shortcuts are automatically disabled while typing. In verse mode: select words from your palette, then click in 3D space to place them.</span>
         </div>
         
         <div id="stats" class="stats-display"></div>
@@ -178,6 +212,12 @@
       
       document.getElementById('camera-zoom-out').addEventListener('click', () => {
         if (window.zoomCamera) window.zoomCamera(50);
+      });
+      
+      // GitHub link functionality
+      document.getElementById('github-link').addEventListener('click', () => {
+        // Replace 'YOUR_GITHUB_URL_HERE' with your actual GitHub repository URL
+        window.open('https://github.com/parsaa74/Semantic-Biome', '_blank');
       });
     </script>
   </body>
