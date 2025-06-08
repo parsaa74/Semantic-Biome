@@ -676,13 +676,13 @@ const WHITE_COLOR_RGB = [255, 255, 255];
 const SCRIPT_HIGHLIGHT_COLORS = {
   // Define colors for each script category.
   // These are examples; adjust as needed for aesthetics and clarity.
-  default: [200, 200, 200], // Light grey for Latin/default
+  default: [0, 100, 255], // Blue for English/Latin
   greek: [0, 150, 255],   // Blue
   armenian: [255, 100, 0], // Orange
   georgian: [100, 200, 50], // Light Green
   hebrew: [150, 100, 255], // Purple
-  arabic: [255, 200, 0],   // Yellow
-  eastAsian: [255, 50, 100], // Pink/Red
+  arabic: [255, 200, 0],   // Yellow for Persian/Arabic
+  eastAsian: [255, 0, 0], // Red for Asian languages
   indic: [0, 200, 150],   // Teal
   southeastAsian: [180, 220, 0], // Lime Green
   syriac: [200, 150, 100], // Brownish
@@ -1297,6 +1297,15 @@ function mouseMoved() {
             'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ', 'Ι', 'Κ', 'Λ', 'Μ', 'Ν',
             'α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν',
             
+            // Arabic/Persian characters (basic set that should be in most Arabic fonts)
+            'ا', 'ب', 'ت', 'ج', 'د', 'ر', 'س', 'ع', 'ف', 'ل', 'م', 'ن', 'ه', 'و', 'ي',
+            // Persian specific (that are commonly supported)
+            'پ', 'چ', 'گ',
+            
+            // East Asian characters (Chinese/Japanese)
+            '你', '好', '谢', '不', '我', '他', '她', '们', '是', '的', '中', '国', '人',
+            '日', '月', '水', '火', '木', '金', '土', '爱', '家', '学', '生',
+            
             // Punctuation and numbers
             '.', ',', '?', '!', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         ];
@@ -1310,7 +1319,11 @@ function mouseMoved() {
         if (/[Α-Ωα-ω]/.test(letter)) {
             scriptCategory = "greek";
         } else if (/[A-Za-z]/.test(letter)) {
-            scriptCategory = "latin";
+            scriptCategory = "default"; // Use "default" for Latin/English letters to match SCRIPT_HIGHLIGHT_COLORS
+        } else if (/[ا-ي]|[پچژگ]/.test(letter)) {
+            scriptCategory = "arabic"; // Arabic and Persian characters
+        } else if (/[\u4e00-\u9fff]/.test(letter)) {
+            scriptCategory = "eastAsian"; // CJK characters
         } else if (/[0-9]/.test(letter)) {
             scriptCategory = "numbers";
         } else {
@@ -1318,7 +1331,18 @@ function mouseMoved() {
         }
         
         // Get 3D destination region for this script category
-        const region = window.letterFlowDestinations3D[scriptCategory] || 
+        // Map categories to letterFlowDestinations3D compatibility
+        let destinationCategory = scriptCategory;
+        if (scriptCategory === "default") {
+            destinationCategory = "latin";
+        } else if (scriptCategory === "arabic") {
+            destinationCategory = "arabic";
+        } else if (scriptCategory === "eastAsian") {
+            destinationCategory = "eastAsian";
+        }
+        
+        const region = window.letterFlowDestinations3D[destinationCategory] || 
+                       window.letterFlowDestinations3D["latin"] ||
                        window.letterFlowDestinations3D["default"];
         
         // Get a 3D position from the mouse
@@ -6678,6 +6702,9 @@ function cycleHighlightScript() {
   currentHighlightIndex = (currentHighlightIndex + 1) % availableScriptCategories.length;
   highlightedScriptCategory = availableScriptCategories[currentHighlightIndex];
   console.log("Highlighting script category:", highlightedScriptCategory);
+  
+  // Update colors of existing mouse-generated letters
+  updateLetterFlowColors();
 
   // Update UI elements to reflect the current mode, if any exist.
   const paletteToggle = document.getElementById("palette-toggle");
@@ -7974,6 +8001,76 @@ function mousePositionTo3D() {
   );
 }
 
+// NEW: Function to get appropriate font for script category
+function getFontForScript(scriptCategory) {
+    let font;
+    switch (scriptCategory) {
+        case "arabic":
+            // Try Arabic fonts in order of preference
+            font = loadedFonts['vazir'];
+            if (!font) {
+                console.warn("Vazir font not loaded, Arabic characters may not display correctly");
+                font = loadedFonts['default'];
+            }
+            return font;
+        case "eastAsian":
+            // Try East Asian fonts
+            return loadedFonts['notoJP'] || loadedFonts['default'];
+        case "armenian":
+            return loadedFonts['notoArmenian'] || loadedFonts['default'];
+        case "indic":
+            return loadedFonts['notoDevanagari'] || loadedFonts['notoBengali'] || loadedFonts['notoMalayalam'] || loadedFonts['default'];
+        case "georgian":
+            return loadedFonts['notoGeorgian'] || loadedFonts['default'];
+        case "ethiopic":
+            return loadedFonts['notoEthiopic'] || loadedFonts['default'];
+        case "southeastAsian":
+            return loadedFonts['notoThai'] || loadedFonts['default'];
+        case "tibetan":
+            return loadedFonts['notoTibetan'] || loadedFonts['default'];
+        case "hebrew":
+            return loadedFonts['notoHebrewThin'] || loadedFonts['default'];
+        case "default":
+        case "greek":
+        case "latin":
+        case "numbers":
+        case "punctuation":
+        default:
+            return loadedFonts['default'];
+    }
+}
+
+// NEW: Function to update colors of existing letter flow meshes
+function updateLetterFlowColors() {
+    for (let i = 0; i < letterOrgData.length; i++) {
+        const letterData = letterOrgData[i];
+        
+        if (letterData.mesh && letterData.mesh.material) {
+            // Determine color based on highlighting mode
+            let scriptColor;
+            if (highlightedScriptCategory === "all_white") {
+                // All white in default mode
+                scriptColor = 0xFFFFFF;
+            } else if (letterData.scriptCategory === highlightedScriptCategory) {
+                // Use script highlight color when it matches the current highlight
+                const highlightColor = SCRIPT_HIGHLIGHT_COLORS[letterData.scriptCategory];
+                if (highlightColor && Array.isArray(highlightColor) && highlightColor.length >= 3) {
+                    // Convert RGB array to hex
+                    scriptColor = (highlightColor[0] << 16) | (highlightColor[1] << 8) | highlightColor[2];
+                } else {
+                    scriptColor = 0xFFFFFF; // White fallback
+                }
+            } else {
+                // White for non-highlighted scripts
+                scriptColor = 0xFFFFFF;
+            }
+            
+            // Update the material color
+            letterData.mesh.material.color.setHex(scriptColor);
+        }
+    }
+}
+
 // NEW: Function to draw and update letter flow
 function drawLetterFlow() {
     // Use THREE.js to render text
@@ -8034,22 +8131,37 @@ function drawLetterFlow() {
         // Create text geometry for the letter if it doesn't exist yet
         if (!letterData.mesh) {
             try {
-                // Always use the default helvetiker font which we know works
-                const font = loadedFonts['default'];
+                // Get appropriate font for this script category
+                const font = getFontForScript(letterData.scriptCategory);
                 
-                // Check if default font is loaded AND is a valid THREE.Font
-                if (font && typeof font.generateShapes === 'function') {
+                // Debug logging for Arabic characters
+                if (letterData.scriptCategory === "arabic") {
+                    console.log(`Creating Arabic letter: '${letterData.letter}', font available: ${font ? 'yes' : 'no'}`);
+                }
+                
+                // Check if font is loaded AND is a valid THREE.Font
+                // For Arabic, we might want to force geometric shapes if text rendering is problematic
+                const forceGeometric = false; // Set to true if Arabic text rendering is problematic
+                
+                if (font && typeof font.generateShapes === 'function' && !forceGeometric) {
                     // Create text geometry
-                    const textGeometry = new THREE.TextGeometry(letterData.letter, {
-                        font: font,
-                        size: letterData.size,
-                        height: letterData.size/4,  // More pronounced 3D extrusion
-                        curveSegments: 6,          // Higher quality curves
-                        bevelEnabled: true,         // Enable beveling for 3D look
-                        bevelThickness: letterData.size/20,
-                        bevelSize: letterData.size/40,
-                        bevelSegments: 3
-                    });
+                    let textGeometry;
+                    try {
+                        textGeometry = new THREE.TextGeometry(letterData.letter, {
+                            font: font,
+                            size: letterData.size,
+                            height: letterData.size/4,  // More pronounced 3D extrusion
+                            curveSegments: 6,          // Higher quality curves
+                            bevelEnabled: true,         // Enable beveling for 3D look
+                            bevelThickness: letterData.size/20,
+                            bevelSize: letterData.size/40,
+                            bevelSegments: 3
+                        });
+                    } catch (textError) {
+                        console.warn(`Failed to create text geometry for '${letterData.letter}' (${letterData.scriptCategory}):`, textError);
+                        // Force fallback to geometric shape
+                        throw textError;
+                    }
                     
                     // Center the text geometry in all dimensions
                     textGeometry.computeBoundingBox();
@@ -8063,9 +8175,28 @@ function drawLetterFlow() {
                         textGeometry.boundingBox.max.z - textGeometry.boundingBox.min.z
                     );
                     
-                    // Create white material for all letters
+                    // Determine color based on highlighting mode
+                    let scriptColor;
+                    if (highlightedScriptCategory === "all_white") {
+                        // All white in default mode
+                        scriptColor = 0xFFFFFF;
+                    } else if (letterData.scriptCategory === highlightedScriptCategory) {
+                        // Use script highlight color when it matches the current highlight
+                        const highlightColor = SCRIPT_HIGHLIGHT_COLORS[letterData.scriptCategory];
+                        if (highlightColor && Array.isArray(highlightColor) && highlightColor.length >= 3) {
+                            // Convert RGB array to hex
+                            scriptColor = (highlightColor[0] << 16) | (highlightColor[1] << 8) | highlightColor[2];
+                        } else {
+                            scriptColor = 0xFFFFFF; // White fallback
+                        }
+                    } else {
+                        // White for non-highlighted scripts
+                        scriptColor = 0xFFFFFF;
+                    }
+                    
+                    // Create material with appropriate color
                     const material = new THREE.MeshPhongMaterial({ 
-                        color: 0xFFFFFF,  // White color for all letters
+                        color: scriptColor,  // Color based on script category and highlighting mode
                         transparent: true,
                         opacity: 0.9,
                         shininess: 40,
@@ -8098,6 +8229,7 @@ function drawLetterFlow() {
                     
                     // Use shapes based on script category
                     switch (letterData.scriptCategory) {
+                        case "default":
                         case "latin":
                             geometry = new THREE.BoxGeometry(
                                 letterData.size, letterData.size, letterData.size/4
@@ -8107,6 +8239,12 @@ function drawLetterFlow() {
                             geometry = new THREE.SphereGeometry(
                                 letterData.size/2, 12, 12
                             );
+                            break;
+                        case "arabic":
+                            geometry = new THREE.OctahedronGeometry(letterData.size/2, 1);
+                            break;
+                        case "eastAsian":
+                            geometry = new THREE.DodecahedronGeometry(letterData.size/2, 0);
                             break;
                         case "numbers":
                             geometry = new THREE.CylinderGeometry(
@@ -8174,8 +8312,28 @@ function drawLetterFlow() {
                 const cubeGeometry = new THREE.BoxGeometry(
                     letterData.size/2, letterData.size/2, letterData.size/2
                 );
+                
+                // Determine color based on highlighting mode
+                let scriptColor;
+                if (highlightedScriptCategory === "all_white") {
+                    // All white in default mode
+                    scriptColor = 0xFFFFFF;
+                } else if (letterData.scriptCategory === highlightedScriptCategory) {
+                    // Use script highlight color when it matches the current highlight
+                    const highlightColor = SCRIPT_HIGHLIGHT_COLORS[letterData.scriptCategory];
+                    if (highlightColor && Array.isArray(highlightColor) && highlightColor.length >= 3) {
+                        // Convert RGB array to hex
+                        scriptColor = (highlightColor[0] << 16) | (highlightColor[1] << 8) | highlightColor[2];
+                    } else {
+                        scriptColor = 0xFFFFFF; // White fallback
+                    }
+                } else {
+                    // White for non-highlighted scripts
+                    scriptColor = 0xFFFFFF;
+                }
+                
                 const material = new THREE.MeshPhongMaterial({ 
-                    color: 0xFFFFFF,  // Pure white for all fallbacks
+                    color: scriptColor,  // Color based on script category and highlighting mode
                     transparent: true, 
                     opacity: 0.8
                 });
@@ -8197,7 +8355,7 @@ function drawLetterFlow() {
             // If this is a fallback representation and fonts are now loaded,
             // attempt to replace with the actual text geometry
             if (letterData.needsReplacement && frameCount % 30 === 0) {
-                const font = loadedFonts['default'];
+                const font = getFontForScript(letterData.scriptCategory);
                 
                 if (font && typeof font.generateShapes === 'function') {
                     try {
